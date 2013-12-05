@@ -1,0 +1,10 @@
+*.class
+*.jar
+*.txt
+target
+.classpath
+.project
+.settings
+output
+dependency-reduced-pom.xml
+
