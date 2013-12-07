@@ -93,7 +93,8 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, NullWritable, 
 
 		neuron.type = type;
 		neuron.synaptic_sum = 0;
-		neuron.fired = 'N';
+		//neuron.fired = 'N';
+		neuron.firingSequence.set("N");
 		neuron.time = 0;
 
 		return neuron;

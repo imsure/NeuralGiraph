@@ -5,8 +5,9 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.FloatWritable;
+import org.apache.hadoop.io.BytesWritable;
+import org.apache.hadoop.io.Text;
+import java.util.*;
 
 public class NeuronWritable implements Writable {
 
@@ -16,9 +17,10 @@ public class NeuronWritable implements Writable {
 	public float recovery;
 	public float potential;
 	public float synaptic_sum;
-	public char fired;
+	public Text firingSequence;
 	
 	public NeuronWritable() {
+		firingSequence = new Text();
 	}
 	
 	public void write(DataOutput out) throws IOException {
@@ -31,7 +33,7 @@ public class NeuronWritable implements Writable {
 		out.writeFloat(recovery);
 		out.writeFloat(potential);
 		out.writeFloat(synaptic_sum);
-		out.writeChar(fired);
+		firingSequence.write(out);
 	}
 	
 	public void readFields(DataInput in) throws IOException {
@@ -44,7 +46,7 @@ public class NeuronWritable implements Writable {
 		recovery = in.readFloat();
 		potential = in.readFloat();
 		synaptic_sum = in.readFloat();
-		fired = in.readChar();
+		this.firingSequence.readFields(in);
 	}
 	
 	@Override
@@ -59,7 +61,7 @@ public class NeuronWritable implements Writable {
 		sb.append(String.format("%.2f", recovery)).append(';');
 		sb.append(String.format("%.2f", potential)).append(';');
 		sb.append(String.format("%.2f", synaptic_sum)).append(';');
-		sb.append(fired);
+		sb.append(this.firingSequence.toString());
 		
 		return sb.toString();
 	}
