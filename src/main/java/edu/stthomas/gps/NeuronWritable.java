@@ -17,10 +17,9 @@ public class NeuronWritable implements Writable {
 	public float recovery;
 	public float potential;
 	public float synaptic_sum;
-	public Text firingSequence;
+	public char fired;
 	
 	public NeuronWritable() {
-		firingSequence = new Text();
 	}
 	
 	public void write(DataOutput out) throws IOException {
@@ -33,7 +32,7 @@ public class NeuronWritable implements Writable {
 		out.writeFloat(recovery);
 		out.writeFloat(potential);
 		out.writeFloat(synaptic_sum);
-		firingSequence.write(out);
+		out.writeChar(fired);
 	}
 	
 	public void readFields(DataInput in) throws IOException {
@@ -46,7 +45,7 @@ public class NeuronWritable implements Writable {
 		recovery = in.readFloat();
 		potential = in.readFloat();
 		synaptic_sum = in.readFloat();
-		this.firingSequence.readFields(in);
+		fired = in.readChar();
 	}
 	
 	@Override
@@ -61,7 +60,7 @@ public class NeuronWritable implements Writable {
 		sb.append(String.format("%.2f", recovery)).append(';');
 		sb.append(String.format("%.2f", potential)).append(';');
 		sb.append(String.format("%.2f", synaptic_sum)).append(';');
-		sb.append(this.firingSequence.toString());
+		sb.append(fired);
 		
 		return sb.toString();
 	}

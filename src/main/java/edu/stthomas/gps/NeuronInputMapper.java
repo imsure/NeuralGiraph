@@ -64,7 +64,7 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, NullWritable, 
 				}
 			}
 
-			output.set(sb.toString().substring(0, sb.length()-1));
+			output.set(sb.toString().substring(0, sb.length()-1)); // remove the trailing ','
 			context.write(NullWritable.get(), output);
 		}
 	}
@@ -93,8 +93,7 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, NullWritable, 
 
 		neuron.type = type;
 		neuron.synaptic_sum = 0;
-		//neuron.fired = 'N';
-		neuron.firingSequence.set("N");
+		neuron.fired = 'N';
 		neuron.time = 0;
 
 		return neuron;

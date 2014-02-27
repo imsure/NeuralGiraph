@@ -65,14 +65,14 @@ NeuronWritable, FloatWritable, FloatWritable> {
 		// Update number of iteration
 		neuron.time += 1;
 		neuron.synaptic_sum = (float) 0.0;
-		//neuron.fired = 'N'; // Reset firing status
+		neuron.fired = 'N'; // Reset firing status
 	}
 
 	@Override
 	public void compute(Iterable<FloatWritable> messages) {
-		
+
 		int max_supersteps = Integer.parseInt(this.getConf().get("max_supersteps", "50"));
-		
+
 		if (getSuperstep() < max_supersteps) {
 			/** Sum up the messages from last super step. */
 			float weight_sum = 0;
@@ -107,14 +107,7 @@ NeuronWritable, FloatWritable, FloatWritable> {
 
 				neuron.potential = neuron.param_c; // Reset the membrane potential (voltage)
 				neuron.recovery += neuron.param_d; // Reset the membrane recovery variable
-				//neuron.fired = 'Y'; // Indicate the neuron fired at this iteration.
-				StringBuilder sb = new StringBuilder(neuron.firingSequence.toString());
-				sb.append('Y');
-				neuron.firingSequence.set(sb.toString());
-			} else {
-				StringBuilder sb = new StringBuilder(neuron.firingSequence.toString());
-				sb.append('N');
-				neuron.firingSequence.set(sb.toString());
+				neuron.fired = 'Y'; // Indicate the neuron fired at this iteration.
 			}
 
 			setValue(neuron); // Update the value of the vertex.

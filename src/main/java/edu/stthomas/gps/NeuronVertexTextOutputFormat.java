@@ -27,5 +27,4 @@ extends TextVertexOutputFormat<IntWritable, NeuronWritable, FloatWritable> {
 			throws IOException, InterruptedException {
 		return new NeuronVertexTextWriter();
 	}
-
 }
