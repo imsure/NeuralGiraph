@@ -50,14 +50,14 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, NullWritable, 
 			 */
 			if (type == 'e') {
 				for (int j = 1; j <= total; j++) {
-					if (randn.nextFloat() < eprob) {
+					if (randn.nextFloat() <= eprob) {
 						String edge = j+":"+String.format("%.2f", (float)0.5*randn.nextFloat());
 						sb.append(edge).append(',');
 					}
 				}
 			} else {
 				for (int j = 1; j <= total; j++) {
-					if (randn.nextFloat() < iprob) {
+					if (randn.nextFloat() <= iprob) {
 						String edge = j+":"+String.format("%.2f",(float)-1*randn.nextFloat());
 						sb.append(edge).append(',');
 					}

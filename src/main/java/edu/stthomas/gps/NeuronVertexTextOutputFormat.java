@@ -13,12 +13,16 @@ import java.io.*;
 public class NeuronVertexTextOutputFormat 
 extends TextVertexOutputFormat<IntWritable, NeuronWritable, FloatWritable> {
 
+	private Text neuron_id = new Text();
+	private Text neuron_value = new Text();
+	
 	private class NeuronVertexTextWriter extends TextVertexWriter {
 		@Override
 		public void writeVertex(Vertex<IntWritable, NeuronWritable, FloatWritable, ?> vertex)
 				throws IOException, InterruptedException {
-			getRecordWriter().write(new Text(vertex.getId().toString()),
-					new Text(vertex.getValue().toString()));
+			neuron_id.set(vertex.getId().toString());
+			neuron_value.set(vertex.getValue().toString());
+			getRecordWriter().write(neuron_id, neuron_value);
 		}
 	}
 

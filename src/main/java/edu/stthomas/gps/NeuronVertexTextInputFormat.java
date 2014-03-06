@@ -72,7 +72,7 @@ FloatWritable, Writable> {
 			neuron.recovery = Float.parseFloat(tokens[7]);
 			neuron.potential = Float.parseFloat(tokens[8]);
 			neuron.synaptic_sum = Float.parseFloat(tokens[9]);
-			//neuron.fired = tokens[10].charAt(0); // ignore it, we are going to use a Byte array to keep track of firing pattern
+			neuron.fired = tokens[10].charAt(0);
 			
 			/** Construct edges. */
 			String[] es = tokens[11].split(",");
