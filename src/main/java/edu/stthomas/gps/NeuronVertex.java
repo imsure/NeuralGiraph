@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
  *
  */
 public class NeuronVertex extends Vertex<IntWritable, 
-NeuronWritable, FloatWritable, FloatWritable> {
+NeuronWritable, NeuronEdgeWritable, FloatWritable> {
 
 	private Random randn = new Random();
 	private FloatWritable weight = new FloatWritable();
@@ -95,14 +95,21 @@ NeuronWritable, FloatWritable, FloatWritable> {
 
 			/** If a neuron fired, send the messages to its outgoing neurons. */
 			if (neuron.potential >= 30.0) {
-				for (Edge<IntWritable, FloatWritable> edge : getEdges()) {
-					weight.set(edge.getValue().get());
-					if (LOG.isDebugEnabled()) {
-						LOG.debug("Vertex " + getId() + " sent to " +
-								edge.getTargetVertexId() + " = " + weight.get());
-					}
+				int delay_counter;
+				for (Edge<IntWritable, NeuronEdgeWritable> edge : getEdges()) {
+					delay_counter = edge.getValue().getDelayCounter();
+					if (delay_counter == 0) { // firing if delay counter reaches zero
+						weight.set(edge.getValue().getWeight());
+						if (LOG.isDebugEnabled()) {
+							LOG.debug("Vertex " + getId() + " sent to " +
+									edge.getTargetVertexId() + " = " + weight.get());
+						}
 
-					sendMessage(edge.getTargetVertexId(), weight);
+						edge.getValue().resetDelayCounter();
+						sendMessage(edge.getTargetVertexId(), weight);
+					} else {
+						edge.getValue().decDelay();
+					}
 				}
 
 				neuron.potential = neuron.param_c; // Reset the membrane potential (voltage)

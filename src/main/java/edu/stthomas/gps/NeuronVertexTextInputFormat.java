@@ -11,6 +11,7 @@ import org.apache.giraph.graph.Vertex;
 import org.apache.giraph.io.formats.TextVertexInputFormat;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
@@ -21,13 +22,13 @@ import com.google.common.collect.Lists;
  * Vertex input format that supports NeuronVertex.
  */
 public class NeuronVertexTextInputFormat extends
-TextVertexInputFormat<IntWritable, NeuronWritable, FloatWritable> 
+TextVertexInputFormat<IntWritable, NeuronWritable, NeuronEdgeWritable> 
 implements ImmutableClassesGiraphConfigurable<IntWritable, NeuronWritable,
-FloatWritable, Writable> {
+NeuronEdgeWritable, Writable> {
 
 	/** Configuration. */
 	private ImmutableClassesGiraphConfiguration<IntWritable, NeuronWritable,
-	FloatWritable, Writable> conf;
+	NeuronEdgeWritable, Writable> conf;
 
 	@Override
 	public TextVertexReader createVertexReader(
@@ -37,13 +38,13 @@ FloatWritable, Writable> {
 
 	@Override
 	public void setConf(ImmutableClassesGiraphConfiguration<IntWritable, NeuronWritable,
-			FloatWritable, Writable> configuration) {
+			NeuronEdgeWritable, Writable> configuration) {
 		this.conf = configuration;
 	}
 
 	@Override
 	public ImmutableClassesGiraphConfiguration<IntWritable, NeuronWritable,
-	FloatWritable, Writable> getConf() {
+	NeuronEdgeWritable, Writable> getConf() {
 		return conf;
 	}
 
@@ -51,13 +52,15 @@ FloatWritable, Writable> {
 	 * VertexReader that supports NeuronVertex
 	 */
 	public class NeuronVertexReader extends 
-	TextVertexInputFormat<IntWritable, NeuronWritable, FloatWritable>.TextVertexReader {
+	TextVertexInputFormat<IntWritable, NeuronWritable, NeuronEdgeWritable>.TextVertexReader {
 
+		public NeuronEdgeWritable edge_val = new NeuronEdgeWritable();
+		
 		@Override
-		public Vertex<IntWritable, NeuronWritable, FloatWritable, Writable> getCurrentVertex()
+		public Vertex<IntWritable, NeuronWritable, NeuronEdgeWritable, Writable> getCurrentVertex()
 				throws IOException, InterruptedException {
 
-			Vertex<IntWritable, NeuronWritable, FloatWritable, Writable> vertex = conf.createVertex();
+			Vertex<IntWritable, NeuronWritable, NeuronEdgeWritable, Writable> vertex = conf.createVertex();
 			String[] tokens = getRecordReader().getCurrentValue().toString().split(";");
 
 			/** Construct vertex ID and value. */
@@ -75,16 +78,18 @@ FloatWritable, Writable> {
 			neuron.fired = tokens[10].charAt(0);
 			
 			/** Construct edges. */
-			String[] es = tokens[11].split(",");
-			List<Edge<IntWritable, FloatWritable>> edges = 
+			String[] es = tokens[11].split(","); // edges are separated by comma
+			List<Edge<IntWritable, NeuronEdgeWritable>> edges = 
 					Lists.newArrayListWithCapacity(es.length);
 
 			for (int i = 0; i < es.length; i++) {
 				String[] elems = es[i].split(":");
 				if (elems.length == 2) {
 					int edge_id = Integer.parseInt(elems[0]);
-					float edge_val = Float.parseFloat(elems[1]);
-					edges.add(EdgeFactory.create(new IntWritable(edge_id), new FloatWritable(edge_val)));
+					String[] vals = elems[1].split("-");
+					edge_val.setWeight(Float.parseFloat(vals[0]));
+					edge_val.setDelay(Integer.parseInt(vals[1]));
+					edges.add(EdgeFactory.create(new IntWritable(edge_id), edge_val));
 				}
 			}
 

@@ -22,6 +22,9 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, NullWritable, 
 	public static final float Excitatory_Prob = (float) 1.0;
 	public static final float Inhibitory_Prob = (float) 1.0;
 
+	public static final int min_delay = 0;
+	public static final int max_delay = 10;
+	
 	@Override
 	public void map(LongWritable key, Text value, Context context) 
 			throws IOException, InterruptedException {
@@ -48,17 +51,20 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, NullWritable, 
 			 * Go through outgoing nodes, create edges from neuron 'i' to neuron 'j', that is,
 			 * synaptic weights that neuron 'i' have to neuron 'j'.
 			 */
+			int delay = randn.nextInt(max_delay);
 			if (type == 'e') {
 				for (int j = 1; j <= total; j++) {
 					if (randn.nextFloat() <= eprob) {
-						String edge = j+":"+String.format("%.2f", (float)0.5*randn.nextFloat());
+						String edge = j+":"+String.format("%.2f", (float)0.5*randn.nextFloat())
+								+ "-" + delay;
 						sb.append(edge).append(',');
 					}
 				}
 			} else {
 				for (int j = 1; j <= total; j++) {
 					if (randn.nextFloat() <= iprob) {
-						String edge = j+":"+String.format("%.2f",(float)-1*randn.nextFloat());
+						String edge = j+":"+String.format("%.2f",(float)-1*randn.nextFloat())
+								+ "-" + delay;
 						sb.append(edge).append(',');
 					}
 				}
