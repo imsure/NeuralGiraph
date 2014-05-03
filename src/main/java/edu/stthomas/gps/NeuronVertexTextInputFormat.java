@@ -63,7 +63,7 @@ FloatWritable, Writable> {
 			/** Construct vertex ID and value. */
 			IntWritable vertex_id = new IntWritable(Integer.parseInt(tokens[0])); // Vertex ID
 			NeuronWritable neuron = new NeuronWritable(); // Vertex value
-			neuron.type = tokens[1].charAt(0);
+			neuron.type.set(tokens[1]);
 			neuron.time = Integer.parseInt(tokens[2]);
 			neuron.param_a = Float.parseFloat(tokens[3]);
 			neuron.param_b = Float.parseFloat(tokens[4]);

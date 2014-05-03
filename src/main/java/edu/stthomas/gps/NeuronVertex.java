@@ -84,13 +84,29 @@ NeuronWritable, FloatWritable, FloatWritable> {
 			NeuronWritable neuron = getValue();
 			neuron.synaptic_sum = weight_sum; // Update synaptic weight summation
 
-			float current;
+			float current = 0;
+			String neuron_type = neuron.type.toString();
 			// Generate thalamic input.
-			if (neuron.type == 'e') {
+			if (neuron_type.equals("ce")) {
 				current = 5 * (float)this.getGaussian();
-			} else {
+			} else if (neuron_type.equals("ci")) {
 				current = 2 * (float)this.getGaussian();
+			} else if (neuron_type.equals("tc")) {
+				current = 0;
+			} else if (neuron_type.equals("stn")) {
+				current = 20 * (float)this.getGaussian();
+			} else if (neuron_type.equals("strd1")) {
+				current = 0;
+			} else if (neuron_type.equals("strd2")) {
+				current = 0;
+			} else if (neuron_type.equals("gpe")) {
+				current = 5 * (float)this.getGaussian();
+			} else if (neuron_type.equals("gpi")) {
+				current = 25 * (float)this.getGaussian();
+			} else {
+				System.err.println("No neuron type matched!!!: " + neuron.type.toString());
 			}
+			
 			this.neuronEvolution(current, neuron); 	// Start Neuron Evolution
 
 			/** If a neuron fired, send the messages to its outgoing neurons. */

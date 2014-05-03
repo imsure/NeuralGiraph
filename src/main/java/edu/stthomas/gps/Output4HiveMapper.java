@@ -16,8 +16,8 @@ extends Mapper<Text, Text, Text, Text> {
 	@Override
 	public void setup(Context context) 
 			throws IOException, InterruptedException {
-		sample.init(new File("random_1000.txt"));
-		sampledIDs = sample.getSampleIDs();
+		//sample.init(new File("random_1000.txt"));
+		//sampledIDs = sample.getSampleIDs();
 	}
 	
 	@Override
@@ -25,8 +25,8 @@ extends Mapper<Text, Text, Text, Text> {
 			throws IOException, InterruptedException {
 		int id = Integer.parseInt(key.toString());
 		
-		if (this.sampledIDs.containsKey(id)) {
+		//if (this.sampledIDs.containsKey(id)) {
 			context.write(key, value);
-		}
+		//}
 	}
 }

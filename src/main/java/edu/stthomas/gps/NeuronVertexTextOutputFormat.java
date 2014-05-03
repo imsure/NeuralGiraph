@@ -21,7 +21,7 @@ extends TextVertexOutputFormat<IntWritable, NeuronWritable, FloatWritable> {
 		public void writeVertex(Vertex<IntWritable, NeuronWritable, FloatWritable, ?> vertex)
 				throws IOException, InterruptedException {
 			neuron_id.set(vertex.getId().toString());
-			neuron_value.set(vertex.getValue().toString());
+			neuron_value.set(vertex.getValue().toString2());
 			getRecordWriter().write(neuron_id, neuron_value);
 		}
 	}
