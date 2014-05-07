@@ -19,8 +19,8 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, NullWritable, 
 	private Text output = new Text();
 	private Random randn = new Random();
 
-	public static final float Excitatory_Prob = (float) 1.0;
-	public static final float Inhibitory_Prob = (float) 1.0;
+	public static final float Excitatory_Prob = (float) 0.2;
+	public static final float Inhibitory_Prob = (float) 0.3;
 
 	@Override
 	public void map(LongWritable key, Text value, Context context) 
@@ -51,14 +51,14 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, NullWritable, 
 			if (type == 'e') {
 				for (int j = 1; j <= total; j++) {
 					if (randn.nextFloat() <= eprob) {
-						String edge = j+":"+String.format("%.2f", (float)0.5*randn.nextFloat());
+						String edge = j+":"+String.format("%.2f", (float)0.25*randn.nextFloat());
 						sb.append(edge).append(',');
 					}
 				}
 			} else {
 				for (int j = 1; j <= total; j++) {
 					if (randn.nextFloat() <= iprob) {
-						String edge = j+":"+String.format("%.2f",(float)-1*randn.nextFloat());
+						String edge = j+":"+String.format("%.2f",(float)-0.3*randn.nextFloat());
 						sb.append(edge).append(',');
 					}
 				}
