@@ -88,21 +88,21 @@ NeuronWritable, FloatWritable, FloatWritable> {
 			String neuron_type = neuron.type.toString();
 			// Generate thalamic input.
 			if (neuron_type.equals("ce")) {
-				current = 5 * (float)this.getGaussian();
+				current = (float)3.5 * (float)this.getGaussian();
 			} else if (neuron_type.equals("ci")) {
 				current = 2 * (float)this.getGaussian();
 			} else if (neuron_type.equals("tc")) {
 				current = 0;
 			} else if (neuron_type.equals("stn")) {
-				current = 20 * (float)this.getGaussian();
+				current = (float)0.5 * (float)this.getGaussian();
 			} else if (neuron_type.equals("strd1")) {
 				current = 0;
 			} else if (neuron_type.equals("strd2")) {
 				current = 0;
 			} else if (neuron_type.equals("gpe")) {
-				current = 5 * (float)this.getGaussian();
+				current = 9 * (float)this.getGaussian();
 			} else if (neuron_type.equals("gpi")) {
-				current = 25 * (float)this.getGaussian();
+				current = 15 * (float)this.getGaussian();
 			} else {
 				System.err.println("No neuron type matched!!!: " + neuron.type.toString());
 			}

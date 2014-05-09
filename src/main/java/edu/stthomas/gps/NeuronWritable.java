@@ -66,17 +66,19 @@ public class NeuronWritable implements Writable {
 		return sb.toString();
 	}
 	
+	/**
+	 * Concatenate the fields of a NeuronWritable into a string for Giraph's output.
+	 * Note: drop those unused fields to save space since we need to output these data
+	 * in each iteration of Giraph.
+	 * 
+	 * @return the string representation of the neuron
+	 */
 	public String toString2() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(type).append('\t');
 		sb.append(time).append('\t');
-		sb.append(String.format("%.2f", param_a)).append('\t');
-		sb.append(String.format("%.2f", param_b)).append('\t');
-		sb.append(String.format("%.2f", param_c)).append('\t');
-		sb.append(String.format("%.2f", param_d)).append('\t');
 		sb.append(String.format("%.2f", recovery)).append('\t');
 		sb.append(String.format("%.2f", potential)).append('\t');
-		sb.append(String.format("%.2f", synaptic_sum)).append('\t');
 		sb.append(fired);
 		
 		return sb.toString();
