@@ -73,6 +73,7 @@ FloatWritable, Writable> {
 			neuron.potential = Float.parseFloat(tokens[8]);
 			neuron.synaptic_sum = Float.parseFloat(tokens[9]);
 			neuron.fired = tokens[10].charAt(0);
+			neuron.channel = Integer.parseInt(tokens[11]);
 			
 			/** Construct edges. */
 			String[] es = tokens[11].split(",");

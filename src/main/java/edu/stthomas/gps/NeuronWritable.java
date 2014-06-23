@@ -18,6 +18,7 @@ public class NeuronWritable implements Writable {
 	public float potential;
 	public float synaptic_sum;
 	public char fired;
+	public int channel; // the channel this neuron belongs to
 	
 	public NeuronWritable() {
 		type = new Text();
@@ -34,6 +35,7 @@ public class NeuronWritable implements Writable {
 		out.writeFloat(potential);
 		out.writeFloat(synaptic_sum);
 		out.writeChar(fired);
+		out.writeInt(channel);
 	}
 	
 	public void readFields(DataInput in) throws IOException {
@@ -47,6 +49,7 @@ public class NeuronWritable implements Writable {
 		potential = in.readFloat();
 		synaptic_sum = in.readFloat();
 		fired = in.readChar();
+		channel = in.readInt();
 	}
 	
 	@Override
@@ -61,7 +64,8 @@ public class NeuronWritable implements Writable {
 		sb.append(String.format("%.2f", recovery)).append(';');
 		sb.append(String.format("%.2f", potential)).append(';');
 		sb.append(String.format("%.2f", synaptic_sum)).append(';');
-		sb.append(fired);
+		sb.append(fired).append(';');
+		sb.append(channel);
 		
 		return sb.toString();
 	}
@@ -79,7 +83,8 @@ public class NeuronWritable implements Writable {
 		sb.append(time).append('\t');
 		sb.append(String.format("%.2f", recovery)).append('\t');
 		sb.append(String.format("%.2f", potential)).append('\t');
-		sb.append(fired);
+		sb.append(fired).append('\t');
+		sb.append(channel);
 		
 		return sb.toString();
 	}

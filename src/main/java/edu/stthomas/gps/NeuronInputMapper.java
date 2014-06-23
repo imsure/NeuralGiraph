@@ -93,7 +93,7 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, NullWritable, 
 			for (int i = start; i <= end; i++) {
 				StringBuilder sb = new StringBuilder();
 				sb.append(i).append(";"); // neuron ID
-				NeuronWritable neuron = generateNeuron(type);
+				NeuronWritable neuron = generateNeuron(type, channel);
 				sb.append(neuron.toString()).append(";");
 
 				/*
@@ -217,9 +217,10 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, NullWritable, 
 	 * Generate a neuron (parameters and its internal state).
 	 * 
 	 * @param type neuron type
+	 * @param channel the channel this neuron belongs to
 	 * @return an instance of NeuronWritable
 	 */
-	private NeuronWritable generateNeuron(String type) {
+	private NeuronWritable generateNeuron(String type, int channel) {
 		NeuronWritable neuron = new NeuronWritable();
 		float randf1 = randn.nextFloat();
 		float randf2 = randn.nextFloat();
@@ -276,6 +277,7 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, NullWritable, 
 		neuron.synaptic_sum = 0;
 		neuron.fired = 'N';
 		neuron.time = 0;
+		neuron.channel = channel;
 
 		return neuron;
 	}

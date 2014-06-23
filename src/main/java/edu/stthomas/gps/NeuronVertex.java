@@ -71,9 +71,10 @@ NeuronWritable, FloatWritable, FloatWritable> {
 	@Override
 	public void compute(Iterable<FloatWritable> messages) {
 
-		int max_supersteps = Integer.parseInt(this.getConf().get("max_supersteps", "50"));
-
-		if (getSuperstep() < max_supersteps) {
+		long max_supersteps = Long.parseLong(this.getConf().get("max_supersteps", "50"));
+		long current_time_step = getSuperstep();
+		
+		if (current_time_step < max_supersteps) {
 			/** Sum up the messages from last super step. */
 			float weight_sum = 0;
 			for (FloatWritable message: messages) {
@@ -100,7 +101,33 @@ NeuronWritable, FloatWritable, FloatWritable> {
 			} else if (neuron_type.equals("strd2")) {
 				current = 0;
 			} else if (neuron_type.equals("gpe")) {
-				current = 9 * (float)this.getGaussian();
+				if (current_time_step <= 1000) { 
+					// no current supplied to GPe before 1000ms
+					current = 0;
+				} 
+				if (current_time_step > 1000 && current_time_step <= 2500) { 
+					// supply current to GPe in channel 1
+					if (neuron.channel == 1) {
+						current = (float) 9.2 * (float)this.getGaussian();
+					}
+					
+					// no input to GPe in channel until 2500 ms 
+					if (neuron.channel == 2) {
+						current = 0;
+					}
+				} 
+				
+				if (current_time_step > 2500) { 
+					// supply current to GPe in channel 2 after 2500 ms
+					if (neuron.channel == 2) { 
+						current = (float) 17.5 * (float)this.getGaussian();
+					}
+					
+					// the same input to channel 1 as previous
+					if (neuron.channel == 1) {
+						current = (float) 9.2 * (float)this.getGaussian();
+					}
+				}
 			} else if (neuron_type.equals("gpi")) {
 				current = 15 * (float)this.getGaussian();
 			} else {
