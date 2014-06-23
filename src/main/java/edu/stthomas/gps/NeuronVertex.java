@@ -18,8 +18,10 @@ import org.apache.giraph.io.formats.AdjacencyListTextVertexInputFormat;
 import org.apache.giraph.io.formats.GeneratedVertexInputFormat;
 import org.apache.giraph.io.formats.TextVertexInputFormat;
 import org.apache.giraph.io.formats.TextVertexOutputFormat;
+import org.apache.giraph.job.GiraphJob;
 import org.apache.giraph.master.DefaultMasterCompute;
 import org.apache.giraph.worker.WorkerContext;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -29,6 +31,7 @@ import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.util.Tool;
 import org.apache.log4j.Logger;
 
 /**
@@ -73,7 +76,7 @@ NeuronWritable, FloatWritable, FloatWritable> {
 
 		long max_supersteps = Long.parseLong(this.getConf().get("max_supersteps", "50"));
 		long current_time_step = getSuperstep();
-		
+
 		if (current_time_step < max_supersteps) {
 			/** Sum up the messages from last super step. */
 			float weight_sum = 0;
@@ -110,19 +113,19 @@ NeuronWritable, FloatWritable, FloatWritable> {
 					if (neuron.channel == 1) {
 						current = (float) 9.2 * (float)this.getGaussian();
 					}
-					
+
 					// no input to GPe in channel until 2500 ms 
 					if (neuron.channel == 2) {
 						current = 0;
 					}
 				} 
-				
+
 				if (current_time_step > 2500) { 
 					// supply current to GPe in channel 2 after 2500 ms
 					if (neuron.channel == 2) { 
 						current = (float) 17.5 * (float)this.getGaussian();
 					}
-					
+
 					// the same input to channel 1 as previous
 					if (neuron.channel == 1) {
 						current = (float) 9.2 * (float)this.getGaussian();
@@ -133,7 +136,7 @@ NeuronWritable, FloatWritable, FloatWritable> {
 			} else {
 				System.err.println("No neuron type matched!!!: " + neuron.type.toString());
 			}
-			
+
 			this.neuronEvolution(current, neuron); 	// Start Neuron Evolution
 
 			/** If a neuron fired, send the messages to its outgoing neurons. */
