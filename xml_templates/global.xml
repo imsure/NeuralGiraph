@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Describes the global range partitioning of the neural network. -->
+<global>
+  <!-- total number of neurons -->
+  <total>2572</total>
+
+  <!-- number of channels -->
+  <channel>2</channel>
+
+  <!-- maximum number of neurons in each partition -->
+  <unit>1000</unit>
+  
+  <!-- how channels are connected -->
+  <channel_connection>
+    <from type="stn"></from>
+    <to type="gpe"></to>
+    <to type="gpi"></to>
+  </channel_connection>
+
+  <!-- range partitioning of channel 1 -->
+  <range type="ce" start="1" end="800" />
+  <range type="ci" start="801" end="1000" />
+  <range type="tc" start="1001" end="1011" />
+  <range type="stn" start="1012" end="1031" />
+  <range type="strd1" start="1032" end="1989" />
+  <range type="strd2" start="1990" end="2468" />
+  <range type="gpe" start="2469" end="2528" />
+  <range type="gpi" start="2529" end="2572" />
+
+</global>

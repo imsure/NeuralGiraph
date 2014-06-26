@@ -1,0 +1,64 @@
+<partition type="tc">
+  
+  <neuron>
+    
+    <start_id channel="1">1001</start_id>
+    
+    <end_id channel="1">1011</end_id>
+    
+    <potential>65</potential>
+    
+    <parameter name="a">
+      
+      <factor1>0.002</factor1>
+      <factor2>0</factor2>
+    </parameter>
+
+    <parameter name="b">
+      
+      <factor1>0.25</factor1>
+      <factor2>0</factor2>
+    </parameter>
+
+    <parameter name="c">
+      
+      <factor1>-65</factor1>
+      <factor2>15</factor2>
+    </parameter>
+
+    <parameter name="d">
+      
+      <factor1>0</factor1>
+      <factor2>-0.05</factor2>
+    </parameter>
+
+  </neuron>
+
+<global>
+  
+  <total>2572</total>
+
+  
+  <channel>2</channel>
+
+  
+  <unit>1000</unit>
+  
+  
+  <channel_connection>
+    <from type="stn" />
+    <to type="gpe" />
+    <to type="gpi" />
+  </channel_connection>
+
+  
+  <range end="800" start="1" type="ce" />
+  <range end="1000" start="801" type="ci" />
+  <range end="1011" start="1001" type="tc" />
+  <range end="1031" start="1012" type="stn" />
+  <range end="1989" start="1032" type="strd1" />
+  <range end="2468" start="1990" type="strd2" />
+  <range end="2528" start="2469" type="gpe" />
+  <range end="2572" start="2529" type="gpi" />
+
+</global></partition>

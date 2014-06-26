@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- A partition of the neural network, the partition contains "gpi" neurons -->
+<partition type="gpi">
+  <!-- Description of the neurons inside the partition -->
+  <neuron>
+    <!-- To be filled by Python parser -->
+    <start_id>xxx</start_id>
+    <!-- To be filled by Python parser -->
+    <end_id>yyy</end_id>
+    
+    <potential>65</potential>
+    
+    <parameter name="a">
+      <!-- a = factor1 + factor2 * random_number(0~1) -->
+      <factor1>0.005</factor1>
+      <factor2>0.001</factor2>
+    </parameter>
+
+    <parameter name="b">
+      <!-- b = factor1 - factor2 * random_number(0~1) -->
+      <factor1>0.32</factor1>
+      <factor2>0.05</factor2>
+    </parameter>
+
+    <parameter name="c">
+      <!-- c = factor1 + factor2 * random_number(0~1)^2 -->
+      <factor1>-65</factor1>
+      <factor2>0</factor2>
+    </parameter>
+
+    <parameter name="d">
+      <!-- d = factor1 - factor2 * random_number(0~1)^2 -->
+      <factor1>2</factor1>
+      <factor2>0</factor2>
+    </parameter>
+
+  </neuron>
+
+  <connection>
+    <!-- Describes types of neurons "gpe" connects to, it is outgoing connection -->
+    <to type="gpi">
+      <probability>0.5</probability>
+      <strength>-0.5</strength>
+    </to>
+
+    <to type="tc">
+      <probability>1</probability>
+      <strength>-1</strength>
+    </to>
+  </connection>
+</partition>

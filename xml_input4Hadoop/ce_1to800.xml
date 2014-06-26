@@ -1,0 +1,91 @@
+<partition type="ce">
+  
+  <neuron>
+    
+    <start_id channel="1">1</start_id>
+    
+    <end_id channel="1">800</end_id>
+    
+    <potential>65</potential>
+    
+    <parameter name="a">
+      
+      <factor1>0.02</factor1>
+      <factor2>0</factor2>
+    </parameter>
+
+    <parameter name="b">
+      
+      <factor1>0.2</factor1>
+      <factor2>0</factor2>
+    </parameter>
+
+    <parameter name="c">
+      
+      <factor1>-65</factor1>
+      <factor2>15</factor2>
+    </parameter>
+
+    <parameter name="d">
+      
+      <factor1>8</factor1>
+      <factor2>6</factor2>
+    </parameter>
+
+  </neuron>
+
+  <connection>
+    
+    <to type="ce">
+      <probability>1</probability>
+      <strength>0.5</strength>
+    </to>
+
+    <to type="ci">
+      <probability>1</probability>
+      <strength>0.5</strength>
+    </to>
+
+    <to type="stn">
+      <probability>0.25</probability>
+      <strength>0.25</strength>
+    </to>
+
+    <to type="strd1">
+      <probability>0.5</probability>
+      <strength>0.2</strength>
+    </to>
+
+    <to type="strd2">
+      <probability>0.5</probability>
+      <strength>0.2</strength>
+    </to>
+  </connection>
+<global>
+  
+  <total>2572</total>
+
+  
+  <channel>2</channel>
+
+  
+  <unit>1000</unit>
+  
+  
+  <channel_connection>
+    <from type="stn" />
+    <to type="gpe" />
+    <to type="gpi" />
+  </channel_connection>
+
+  
+  <range end="800" start="1" type="ce" />
+  <range end="1000" start="801" type="ci" />
+  <range end="1011" start="1001" type="tc" />
+  <range end="1031" start="1012" type="stn" />
+  <range end="1989" start="1032" type="strd1" />
+  <range end="2468" start="1990" type="strd2" />
+  <range end="2528" start="2469" type="gpe" />
+  <range end="2572" start="2529" type="gpi" />
+
+</global></partition>
