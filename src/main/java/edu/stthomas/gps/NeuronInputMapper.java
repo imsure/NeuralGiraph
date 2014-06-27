@@ -1,8 +1,10 @@
 package edu.stthomas.gps;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.*;
 
+import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
@@ -10,13 +12,18 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 import java.util.*;
+import org.w3c.dom.*;
+import org.xml.sax.InputSource;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
 
 /**
  * The Mapper class is used to generate input data for 
  * a neuron network based on the metadata provided.
  *
  */
-public class NeuronInputMapper extends Mapper<LongWritable, Text, NullWritable, Text>
+public class NeuronInputMapper extends Mapper<NullWritable, BytesWritable, NullWritable, Text>
 {
 	private Text output = new Text();
 	private Random randn = new Random();
@@ -48,69 +55,22 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, NullWritable, 
 	 * 801,1000,2579,2,ci,ce:1~-1,ci:1~-1
 	 */
 	@Override
-	public void map(LongWritable key, Text value, Context context) 
+	public void map(NullWritable key, BytesWritable value, Context context) 
 			throws IOException, InterruptedException {
-
-		// store connection information about the current type of neuron to its outgoing neurons. 
-		// key: type of the outgoing neurons 
-		// value: probability and weight of the connection.
-		HashMap<String, String> connections = new HashMap<String, String>();
-
-		String[] fields = value.toString().split(",");
-
-		total_in_onechannel = Integer.parseInt(fields[2]); // total number of neurons in one channel
-		num_channels = Integer.parseInt(fields[3]); // number of channels
-		start_id_channel1 = Integer.parseInt(fields[0]) ;
-		end_id_channel1 = Integer.parseInt(fields[1]);
-		type = fields[4]; // the current type neuron the map is processing
-
-		this.StnDiffuseProb = (float) 0.5 / num_channels;
+		String xml = value.toString();
 		
-		/* 
-		 * Build a map between type of neuron and probability and weight of the connection.
-		 */
-		if (fields.length > 5) {
-			for (int i = 5; i < fields.length; ++i) {
-				String[] elems = fields[i].split(":");
-				// System.err.println(type+":"+elems[0]);
-				connections.put(elems[0], elems[1]);
-			}
-		}
-
-		/*
-		 * Build a neural network that consist multiple channels.
-		 * 
-		 * In each channel, iterate through start neuron id to end neuron id to build the input data
-		 * for each neuron.
-		 */
-
-		for (int channel = 1; channel <= num_channels; ++channel) {
-			// start ID of the current type of neuron for the given 'channel'
-			int start = start_id_channel1 + total_in_onechannel * (channel - 1); 
-			// end ID of the current type of neuron for the given 'channel'
-			int end = end_id_channel1 + total_in_onechannel * (channel - 1); 
+		try {
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = docFactory.newDocumentBuilder();
 			
-			for (int i = start; i <= end; i++) {
-				StringBuilder sb = new StringBuilder();
-				sb.append(i).append(";"); // neuron ID
-				NeuronWritable neuron = generateNeuron(type, channel);
-				sb.append(neuron.toString()).append(";");
-
-				/*
-				 * Go through outgoing nodes, create edges from neuron 'i' to neuron 'j', that is,
-				 * synaptic weights that neuron 'i' have to neuron 'j'.
-				 */
-				for (Map.Entry<String, String> entry : connections.entrySet()) {
-					String outgoing_neuron_type = entry.getKey();
-					String prob_weight = entry.getValue();
-
-					buildConnection(outgoing_neuron_type, prob_weight, sb, channel);
-				}
-
-				output.set(sb.toString().substring(0, sb.length()-1)); // remove the trailing ','
-				context.write(NullWritable.get(), output);
-			}
-		}
+			InputSource is = new InputSource(new StringReader(xml));
+			Document doc = dBuilder.parse(is);
+			doc.getDocumentElement().normalize();
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+	    }
 	}
 
 	/**

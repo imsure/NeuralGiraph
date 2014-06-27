@@ -24,7 +24,8 @@ public class NeuronInput extends Configured implements Tool {
 	public int run(String[] args) throws Exception {
 		
 		if (args.length != 2) {
-			System.err.printf("Usage: %s [generic options] <input> <output>\n", getClass().getSimpleName());
+			System.err.printf("Usage: %s [generic options] <input> <output>\n", 
+					getClass().getSimpleName());
 			ToolRunner.printGenericCommandUsage(System.err);
 			System.exit(-1);
 		}
@@ -35,20 +36,18 @@ public class NeuronInput extends Configured implements Tool {
 		Job job = new Job(getConf());
 		
 		job.setJarByClass(this.getClass());
-		job.setJobName("Neuron Graph Input Generation for Giraph");
+		job.setJobName("Neural Network Generation for Giraph");
 		
 		FileInputFormat.addInputPath(job, new Path(input));
 		FileOutputFormat.setOutputPath(job, new Path(output));
+		
+		job.setInputFormatClass(WholeFileInputFormat.class);
 		
 		job.setMapperClass(NeuronInputMapper.class);
 		job.setNumReduceTasks(0); // This is a mapper only job.
 		
 		job.setOutputKeyClass(NullWritable.class);
 		job.setOutputValueClass(Text.class);
-		
-		// No need to do this if it is a mapper only job.
-		//job.setMapOutputKeyClass(NeuronWritable.class);
-		//job.setMapOutputValueClass(AdjListWritable.class);
 		
 		return job.waitForCompletion(true) ? 0 : -1;
 	}
