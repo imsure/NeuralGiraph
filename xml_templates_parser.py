@@ -19,15 +19,11 @@ def create_output(neuron_type, start_id, end_id, num_per_partition, global_root)
         output_fname = neuron_type + '_' + str(start) + 'to' + str(end) + '.xml'
         path = os.path.join( output_path, output_fname )
 
-        start_id_channel1 = root.find('neuron').find('start_id')
-        start_id_channel1.text = str(start)
-        start_id_channel1.set('channel', '1')
+        neuron = root.find( 'neuron' )
+        neuron.set( 'start_id', str(start) )
+        neuron.set( 'end_id', str(end) )
 
-        end_id_channel1 = root.find('neuron').find('end_id')
-        end_id_channel1.text = str(end)
-        end_id_channel1.set('channel', '1')
-
-        root.append(global_root)
+        root.append( global_root )
         tree.write( path )
     
 
@@ -41,9 +37,9 @@ if __name__ == '__main__':
     tree = ET.parse( os.path.join(template_path, 'global.xml') )
     root = tree.getroot()
 
-    total_num_neurons = int( root.find('total').text )
-    num_channels = int( root.find('channel').text )
-    num_neuron_partition = int( root.find('unit').text )
+    total_num_neurons = int( root.attrib['total'] )
+    num_channels = int( root.attrib['channel'] )
+    num_neuron_partition = int( root.attrib['unit'] )
 
     print 'Total number of neurons:', total_num_neurons
     print 'Number of channels:', num_channels

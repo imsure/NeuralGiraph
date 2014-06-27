@@ -1,67 +1,24 @@
-<partition type="stn">
+<partition>
   
-  <neuron>
+  
+  <neuron end_id="1031" potential="65" start_id="1012" type="stn">
     
-    <start_id channel="1">1012</start_id>
+    <parameter factor1="0.005" factor2="0" name="a" />
     
-    <end_id channel="1">1031</end_id>
+    <parameter factor1="0.265" factor2="0" name="b" />
     
-    <potential>65</potential>
+    <parameter factor1="-65" factor2="0" name="c" />
     
-    <parameter name="a">
-      
-      <factor1>0.005</factor1>
-      <factor2>0</factor2>
-    </parameter>
-
-    <parameter name="b">
-      
-      <factor1>0.265</factor1>
-      <factor2>0</factor2>
-    </parameter>
-
-    <parameter name="c">
-      
-      <factor1>-65</factor1>
-      <factor2>0</factor2>
-    </parameter>
-
-    <parameter name="d">
-      
-      <factor1>0</factor1>
-      <factor2>-2</factor2>
-    </parameter>
-
+    <parameter factor1="0" factor2="-2" name="d" />
   </neuron>
 
   <connection>
     
-    <to type="stn">
-      <probability>0.25</probability>
-      <strength>0.1</strength>
-    </to>
-
-    <to type="gpe">
-      <probability>0.25</probability>
-      <strength>0.2</strength>
-    </to>
-
-    <to type="gpi">
-      <probability>0.8</probability>
-      <strength>0.2</strength>
-    </to>
-
+    <to probability="0.25" strength="0.1" type="stn" />
+    <to probability="0.25" strength="0.2" type="gpe" />
+    <to probability="0.8" strength="0.2" type="gpi" />
   </connection>
-<global>
-  
-  <total>2572</total>
-
-  
-  <channel>2</channel>
-
-  
-  <unit>1000</unit>
-  
+<global channel="2" total="2572" unit="1000">
   
   <channel_connection>
     <from type="stn" />

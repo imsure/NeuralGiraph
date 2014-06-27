@@ -1,52 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- A partition of the neural network, the partition contains "gpe" neurons -->
-<partition type="gpe">
+<partition>
   <!-- Description of the neurons inside the partition -->
-  <neuron>
-    <!-- To be filled by Python parser -->
-    <start_id>xxx</start_id>
-    <!-- To be filled by Python parser -->
-    <end_id>yyy</end_id>
-    
-    <potential>65</potential>
-    
-    <parameter name="a">
-      <!-- a = factor1 + factor2 * random_number(0~1) -->
-      <factor1>0.005</factor1>
-      <factor2>0.001</factor2>
-    </parameter>
-
-    <parameter name="b">
-      <!-- b = factor1 - factor2 * random_number(0~1) -->
-      <factor1>0.585</factor1>
-      <factor2>0.05</factor2>
-    </parameter>
-
-    <parameter name="c">
-      <!-- c = factor1 + factor2 * random_number(0~1)^2 -->
-      <factor1>-65</factor1>
-      <factor2>0</factor2>
-    </parameter>
-
-    <parameter name="d">
-      <!-- d = factor1 - factor2 * random_number(0~1)^2 -->
-      <factor1>4</factor1>
-      <factor2>0</factor2>
-    </parameter>
-
+  <!-- start_id and end_id will be filled by Python parser -->
+  <neuron type="gpe" start_id="xxx" end_id="yyy" potential="65">
+    <!-- a = factor1 + factor2 * random_number(0~1) -->
+    <parameter name="a" factor1="0.005" factor2="0.001" />
+    <!-- b = factor1 - factor2 * random_number(0~1) -->
+    <parameter name="b" factor1="0.585" factor2="0.05" />
+    <!-- c = factor1 + factor2 * random_number(0~1)^2 -->
+    <parameter name="c" factor1="-65" factor2="0" />
+    <!-- d = factor1 - factor2 * random_number(0~1)^2 -->
+    <parameter name="d" factor1="-65" factor2="0" />
   </neuron>
 
   <connection>
     <!-- Describes types of neurons "gpe" connects to, it is outgoing connection -->
-    <to type="gpe">
-      <probability>0.75</probability>
-      <strength>-5</strength>
-    </to>
-
-    <to type="stn">
-      <probability>0.8</probability>
-      <strength>-1</strength>
-    </to>
+    <to type="gpe" probability="0.75" strength="-5" />
+    <to type="stn" probability="0.8" strength="-1" />
   </connection>
 </partition>

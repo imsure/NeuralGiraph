@@ -1,67 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- A partition of the neural network, the partition contains "ce" neurons -->
-<partition type="ce">
+<partition>
   <!-- Description of the neurons inside the partition -->
-  <neuron>
-    <!-- To be filled by Python parser -->
-    <start_id>xxx</start_id>
-    <!-- To be filled by Python parser -->
-    <end_id>yyy</end_id>
-    
-    <potential>65</potential>
-    
-    <parameter name="a">
-      <!-- a = factor1 + factor2 * random_number(0~1) -->
-      <factor1>0.02</factor1>
-      <factor2>0</factor2>
-    </parameter>
-
-    <parameter name="b">
-      <!-- b = factor1 - factor2 * random_number(0~1) -->
-      <factor1>0.2</factor1>
-      <factor2>0</factor2>
-    </parameter>
-
-    <parameter name="c">
-      <!-- c = factor1 + factor2 * random_number(0~1)^2 -->
-      <factor1>-65</factor1>
-      <factor2>15</factor2>
-    </parameter>
-
-    <parameter name="d">
-      <!-- d = factor1 - factor2 * random_number(0~1)^2 -->
-      <factor1>8</factor1>
-      <factor2>6</factor2>
-    </parameter>
-
+  <!-- start_id and end_id will be filled by Python parser -->
+  <neuron type="ce" start_id="xxx" end_id="yyy" potential="65">
+    <!-- a = factor1 + factor2 * random_number(0~1) -->
+    <parameter name="a" factor1="0.02" factor2="0" />
+    <!-- b = factor1 - factor2 * random_number(0~1) -->
+    <parameter name="b" factor1="0.2" factor2="0" />
+    <!-- c = factor1 + factor2 * random_number(0~1)^2 -->	  
+    <parameter name="c" factor1="-65" factor2="15" />
+    <!-- d = factor1 - factor2 * random_number(0~1)^2 -->
+    <parameter name="d" factor1="8" factor2="6" />
   </neuron>
 
   <connection>
-    <!-- Describes types of neurons "ce" connects to, it is outgoing connection -->
-    <to type="ce">
-      <probability>1</probability>
-      <strength>0.5</strength>
-    </to>
-
-    <to type="ci">
-      <probability>1</probability>
-      <strength>0.5</strength>
-    </to>
-
-    <to type="stn">
-      <probability>0.25</probability>
-      <strength>0.25</strength>
-    </to>
-
-    <to type="strd1">
-      <probability>0.5</probability>
-      <strength>0.2</strength>
-    </to>
-
-    <to type="strd2">
-      <probability>0.5</probability>
-      <strength>0.2</strength>
-    </to>
+    <!-- Describes types of neurons "ce" connects to, these are outgoing connection -->
+    <to type="ce" probability="1" strength="0.5" />
+    <to type="ci" probability="1" strength="0.5" />
+    <to type="stn" probability="0.25" strength="0.25" />
+    <to type="strd1" probability="0.5" strength="0.2" />
+    <to type="strd2" probability="0.5" strength="0.2" />
   </connection>
+  
 </partition>

@@ -1,61 +1,23 @@
-<partition type="strd2">
+<partition>
   
-  <neuron>
+  
+  <neuron end_id="2468" potential="65" start_id="1990" type="strd2">
     
-    <start_id channel="1">1990</start_id>
+    <parameter factor1="0.01" factor2="0.01" name="a" />
     
-    <end_id channel="1">2468</end_id>
+    <parameter factor1="0.275" factor2="0.05" name="b" />
     
-    <potential>65</potential>
+    <parameter factor1="-65" factor2="0" name="c" />
     
-    <parameter name="a">
-      
-      <factor1>0.01</factor1>
-      <factor2>0.01</factor2>
-    </parameter>
-
-    <parameter name="b">
-      
-      <factor1>0.275</factor1>
-      <factor2>0.05</factor2>
-    </parameter>
-
-    <parameter name="c">
-      
-      <factor1>-65</factor1>
-      <factor2>0</factor2>
-    </parameter>
-
-    <parameter name="d">
-      
-      <factor1>2</factor1>
-      <factor2>0</factor2>
-    </parameter>
-
+    <parameter factor1="2" factor2="0" name="d" />
   </neuron>
 
   <connection>
     
-    <to type="gpe">
-      <probability>1</probability>
-      <strength>-2</strength>
-    </to>
-
-    <to type="strd2">
-      <probability>0.75</probability>
-      <strength>-1</strength>
-    </to>
+    <to probability="1" strength="-2" type="gpe" />
+    <to probability="0.75" strength="-1" type="strd2" />
   </connection>
-<global>
-  
-  <total>2572</total>
-
-  
-  <channel>2</channel>
-
-  
-  <unit>1000</unit>
-  
+<global channel="2" total="2572" unit="1000">
   
   <channel_connection>
     <from type="stn" />
