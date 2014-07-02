@@ -29,15 +29,21 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 	private Text output = new Text();
 	private Text filename = new Text();
 	private Random randn = new Random();
-	
+
 	private int start_id_channel1;
 	private int end_id_channel1;
 	private int total_in_onechannel; // total number of neurons in one channel
 	private int num_channels; // number of channels
 	private String type; // the current type neuron the map is processing
 	private float potential; // membrane potential (mv)
-	
-    /* diffuse projections listed in Table 1B, spanned all 
+
+	// Channel connections
+	private ArrayList<ChannelConnection> channel_conns;
+
+	// Mapping neuron type to its range.
+	private Map<String, int[]> type_ranges;
+
+	/* diffuse projections listed in Table 1B, spanned all 
        channels and the connection probability was divided 
        among each of those" - Thibeault & Srinivasa, 2013 */
 	private float StnDiffuseProb;
@@ -50,7 +56,7 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 		Path path = ((FileSplit) split).getPath();
 		this.filename.set(path.toString());
 	}
-	
+
 	/**
 	 * Each map method takes a line of metadata about a specific type of neuron.
 	 * The meta data is define as:
@@ -64,31 +70,24 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 	@Override
 	public void map(NullWritable key, Text value, Context context) 
 			throws IOException, InterruptedException {
-		
+
 		String xml = value.toString();
-		
+
 		// Mapping neuron type to connection probability & strength
 		Map<String, float[]> conns;
-		
-		// Channel connections. Key is source type, Value is destination types.
-		Map<String, ArrayList<String>> channel_conns;
-		
-		// Mapping neuron type to its range.
-		Map<String, int[]> type_ranges;
-		
+
 		NeuronWritable neuron;
-				
+
 		try {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = docFactory.newDocumentBuilder();
-			
-			
+
 			InputSource is = new InputSource(new StringReader(xml));
 			Document doc = dBuilder.parse(is);
-			
+
 			Element root = doc.getDocumentElement(); // Extract root element
 			root.normalize(); // Normalize the tree merge text nodes.
-	
+
 			/* 
 			 * Extract the only one 'neuron' tag
 			 */
@@ -98,10 +97,10 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 			this.end_id_channel1 = Integer.parseInt( neuron_tag.getAttribute("end_id") );
 			this.potential = Float.parseFloat( neuron_tag.getAttribute("potential") );
 			NodeList parameters = neuron_tag.getElementsByTagName("parameter");
-			
+
 			// Get the connections mapping.
 			conns = this.getConnenctions(root);
-			
+
 			/*
 			 * Extract channel connections and ID range for each type from 'global' tag.
 			 */
@@ -110,18 +109,116 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 			this.total_in_onechannel = Integer.parseInt( global.getAttribute("total") );
 			channel_conns = this.getChannelConnections(global);
 			type_ranges = this.getRanges(global);
-			
-			for (int i = this.start_id_channel1; i <= this.end_id_channel1; ++i) {
-				neuron = this.getNeuronWritable(1, parameters);
-				output.set(neuron.toString());
-				context.write(NullWritable.get(), output);
+
+			/*
+			 * Build up partition of the neural network.
+			 * Iterate over channels, inside each channel, iteration over neuron IDs.
+			 */
+			for (int j = 1; j <= this.num_channels; ++j) {
+				int channel = j;
+				// ID range for the current 'channel'
+				int[] range = this.getRange(this.type, channel); 
+
+				for (int i = range[0]; i <= range[1]; ++i) {
+					StringBuilder sb = new StringBuilder();
+					sb.append(i).append(';'); // Neuron ID
+					neuron = this.getNeuronWritable(channel, parameters);
+					sb.append(neuron.toString()).append(';');
+
+					// Construct edges inside the 'channel'
+					for (Map.Entry<String, float[]> entry : conns.entrySet()) {
+						String target = entry.getKey();
+						float conn_prob = entry.getValue()[0];
+						float conn_strength = entry.getValue()[1];
+						constructEdges( target, conn_prob, conn_strength, channel, sb );
+					}
+	
+					buildChannelConnection( channel, sb );
+					
+					output.set(sb.toString());
+					context.write(NullWritable.get(), output);
+				}
 			}
 		} catch (Exception e) {
 			output.set(e.toString());
 			context.write(NullWritable.get(), output);
-	    }
-		
+		}
+
 	}
+
+	/**
+	 * Return the range of for a specific type of neuron in a specific channel.
+	 * 
+	 * @param type neuron type
+	 * @param channel channel number
+	 * @return range array, start index: 0, end index: 1
+	 */
+	private int[] getRange(String type, int channel) {
+		int[] range = new int[2];
+
+		int start = this.type_ranges.get(type)[0];
+		int end = this.type_ranges.get(type)[1];
+
+		start += (channel - 1) * this.total_in_onechannel;
+		end += (channel - 1) * this.total_in_onechannel;
+
+		range[0] = start;
+		range[1] = end;
+
+		return range;
+	}
+
+	private void buildChannelConnection( int channel, StringBuilder sb ) {
+		for (int i = 0; i < this.channel_conns.size(); ++i) {
+			ChannelConnection cc = this.channel_conns.get(i);
+			
+			// check if 'this.type' is a source channel
+			if ( this.type.equals(cc.getSourceChannel()) ) { 
+				ArrayList<String> targets = cc.getTargetChannels();
+				float diffuse_prob = cc.getDiffuseProb();
+				float diffuse_weight = cc.getDiffuseWeight();
+				
+				for (int j = 1; j <= this.num_channels; ++j) {					
+					if (j != channel) { // skip the current channel
+						for (int k = 0; k < targets.size(); ++k) {
+							String target = targets.get( k );
+							int[] range = this.getRange( target, j );
+							for (int z = range[0]; z <= range[1]; ++z) {
+								if (this.randn.nextFloat() <= diffuse_prob) {
+									String edge = z + ":" + String.format("%.2f", 
+											diffuse_weight*randn.nextFloat());
+									sb.append(edge).append(',');
+								}
+							}
+						}
+					}
+				}
+				
+				break;
+			}
+		}
+	}
+	
+	/**
+	 * Construct edges from this.type to 'target', in 'channel'.
+	 * 
+	 * @param target
+	 * @param prob
+	 * @param strength
+	 * @param sb
+	 */
+	private void constructEdges( String target, float prob,
+			float strength, int channel, StringBuilder sb ) {
+		int[] range = this.getRange(target, channel);
+
+		// construct edges inside the given channel
+		for (int j = range[0]; j <= range[1]; j++) {
+			if (randn.nextFloat() <= prob) {
+				String edge = j+":"+String.format("%.2f", strength*randn.nextFloat());
+				sb.append(edge).append(',');
+			}
+		}
+	} 
 
 	/**
 	 * Return a NeuronWritable given a channel number
@@ -135,7 +232,7 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 		float randf1 = randn.nextFloat();
 		float randf2 = randn.nextFloat();
 		float a, b, c, d, f1, f2;
-		
+
 		for (int i = 0; i < params.getLength(); ++i) {
 			Element param = (Element) params.item(i);
 			char name = param.getAttribute("name").charAt(0);
@@ -156,7 +253,7 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 				break;
 			}
 		}
-		
+
 		neuron.potential = this.potential;
 		neuron.recovery = neuron.potential * neuron.param_b;
 		neuron.type.set(this.type);
@@ -164,10 +261,10 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 		neuron.fired = 'N'; // initial firing status: Not fired
 		neuron.time = 0; // initial time step: 0 ms
 		neuron.channel = channel;
-		
+
 		return neuron;
 	}
-	
+
 	/**
 	 * Extract 'connection' tag from root element.
 	 * 
@@ -176,7 +273,7 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 	 */
 	private Map<String, float[]> getConnenctions( Element root ) {
 		Map<String, float[]> conns = new HashMap<String, float[]>();
-		
+
 		Element connection = (Element) root.getElementsByTagName("connection").item(0);
 		NodeList tos = connection.getElementsByTagName("to");
 		for (int i = 0; i < tos.getLength(); ++i) {
@@ -188,40 +285,43 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 
 			conns.put(type, prob_strength);
 		}
-		
+
 		return conns;
 	}
-	
+
 	/**
 	 * Extract "connection_channel" tag from 'global' tag.
 	 * 
 	 * @param global 'global' tag
 	 * @return channel connection mapping
 	 */
-	private Map<String, ArrayList<String>> getChannelConnections( Element global ) {
-		Map<String, ArrayList<String>> channel_conns = new HashMap<String, ArrayList<String>>();
-		
-		NodeList conns = global.getElementsByTagName("channel_connections");
+	private ArrayList<ChannelConnection> getChannelConnections( Element global ) {
+		ArrayList<ChannelConnection> channel_conns = new ArrayList<ChannelConnection>();
+
+		NodeList conns = global.getElementsByTagName("channel_connection");
 		for (int i = 0; i < conns.getLength(); ++i) {
+			ChannelConnection cc = new ChannelConnection();
 			Element conn = (Element) conns.item(i);
-			String source = conn.getAttribute("from");
-			ArrayList<String> targets = new ArrayList<String>();
-			
+
+			cc.setSourceChannel( conn.getAttribute("from") );
+			cc.setDiffuseProb( Float.parseFloat(conn.getAttribute("diffuse_prob")) );
+			cc.setDiffuseWeight( Float.parseFloat(conn.getAttribute("diffuse_weight")) );
+
 			NodeList tos = conn.getElementsByTagName("to");
 			for (int j = 0; j < tos.getLength(); ++j) {
 				Element to = (Element) tos.item(j);
-				targets.add(to.getAttribute("type"));
+				cc.addTargetChannel(to.getAttribute("type"));
 			}
-			
-			channel_conns.put(source, targets);
+
+			channel_conns.add(cc);
 		}
-		
+
 		return channel_conns;
 	}
-	
+
 	private Map<String, int[]> getRanges( Element global ) {
 		Map<String, int[]> type_ranges = new HashMap<String, int[]>();
-		
+
 		NodeList ranges = global.getElementsByTagName("range");
 		for (int i = 0; i < ranges.getLength(); ++i) {
 			int[] start_end = new int[2];
@@ -230,7 +330,7 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 			start_end[1] = Integer.parseInt( range.getAttribute("end") );
 			type_ranges.put( range.getAttribute("type"), start_end );
 		}
-		
+
 		return type_ranges;
 	}
 }
