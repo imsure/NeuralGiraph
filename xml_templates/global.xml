@@ -5,8 +5,7 @@
 <!-- total number of neurons, number of channels, maximum number of neurons in each partition -->
 <global total="2572" channel="2" unit="1000">
   <!-- how channels are connected -->
-  <channel_connection>
-    <from type="stn"></from>
+  <channel_connection from="stn" diffuse_prob="0.5" diffuse_weight="0.35">
     <to type="gpe"></to>
     <to type="gpi"></to>
   </channel_connection>

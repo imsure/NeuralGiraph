@@ -1,31 +1,33 @@
 package edu.stthomas.gps;
 
-import java.io.IOException;
-import java.io.StringReader;
+import org.w3c.dom.*;
+
+import javax.xml.parsers.*;
+import java.io.*;
 import java.util.*;
 
+import org.xml.sax.InputSource;
+
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Mapper.Context;
-import java.util.*;
-import org.w3c.dom.*;
-import org.xml.sax.InputSource;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 /**
  * The Mapper class is used to generate input data for 
  * a neuron network based on the metadata provided.
  *
  */
-public class NeuronInputMapper extends Mapper<NullWritable, BytesWritable, NullWritable, Text>
+public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, Text>
 {
 	private Text output = new Text();
+	private Text filename = new Text();
 	private Random randn = new Random();
 	
 	private int start_id_channel1;
@@ -33,17 +35,22 @@ public class NeuronInputMapper extends Mapper<NullWritable, BytesWritable, NullW
 	private int total_in_onechannel; // total number of neurons in one channel
 	private int num_channels; // number of channels
 	private String type; // the current type neuron the map is processing
+	private float potential; // membrane potential (mv)
 	
     /* diffuse projections listed in Table 1B, spanned all 
        channels and the connection probability was divided 
        among each of those" - Thibeault & Srinivasa, 2013 */
 	private float StnDiffuseProb;
-	private final float DiffuseWeight = (float) 0.35;
-	
-	@Override
-	public void setup(Context context) {
-	}
+	private float DiffuseWeight = (float) 0.35;
 
+	@Override
+	public void setup(Context context) 
+			throws IOException, InterruptedException {
+		InputSplit split = context.getInputSplit();
+		Path path = ((FileSplit) split).getPath();
+		this.filename.set(path.toString());
+	}
+	
 	/**
 	 * Each map method takes a line of metadata about a specific type of neuron.
 	 * The meta data is define as:
@@ -55,190 +62,175 @@ public class NeuronInputMapper extends Mapper<NullWritable, BytesWritable, NullW
 	 * 801,1000,2579,2,ci,ce:1~-1,ci:1~-1
 	 */
 	@Override
-	public void map(NullWritable key, BytesWritable value, Context context) 
+	public void map(NullWritable key, Text value, Context context) 
 			throws IOException, InterruptedException {
+		
 		String xml = value.toString();
 		
+		// Mapping neuron type to connection probability & strength
+		Map<String, float[]> conns;
+		
+		// Channel connections. Key is source type, Value is destination types.
+		Map<String, ArrayList<String>> channel_conns;
+		
+		// Mapping neuron type to its range.
+		Map<String, int[]> type_ranges;
+		
+		NeuronWritable neuron;
+				
 		try {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = docFactory.newDocumentBuilder();
 			
+			
 			InputSource is = new InputSource(new StringReader(xml));
 			Document doc = dBuilder.parse(is);
-			doc.getDocumentElement().normalize();
 			
+			Element root = doc.getDocumentElement(); // Extract root element
+			root.normalize(); // Normalize the tree merge text nodes.
+	
+			/* 
+			 * Extract the only one 'neuron' tag
+			 */
+			Element neuron_tag = (Element) doc.getElementsByTagName("neuron").item(0);
+			this.type = neuron_tag.getAttribute("type");
+			this.start_id_channel1 = Integer.parseInt( neuron_tag.getAttribute("start_id") );
+			this.end_id_channel1 = Integer.parseInt( neuron_tag.getAttribute("end_id") );
+			this.potential = Float.parseFloat( neuron_tag.getAttribute("potential") );
+			NodeList parameters = neuron_tag.getElementsByTagName("parameter");
 			
+			// Get the connections mapping.
+			conns = this.getConnenctions(root);
+			
+			/*
+			 * Extract channel connections and ID range for each type from 'global' tag.
+			 */
+			Element global = (Element) root.getElementsByTagName("global").item(0);
+			this.num_channels = Integer.parseInt( global.getAttribute("channel") );
+			this.total_in_onechannel = Integer.parseInt( global.getAttribute("total") );
+			channel_conns = this.getChannelConnections(global);
+			type_ranges = this.getRanges(global);
+			
+			for (int i = this.start_id_channel1; i <= this.end_id_channel1; ++i) {
+				neuron = this.getNeuronWritable(1, parameters);
+				output.set(neuron.toString());
+				context.write(NullWritable.get(), output);
+			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			output.set(e.toString());
+			context.write(NullWritable.get(), output);
 	    }
-	}
-
-	/**
-	 * Given a neuron type, return the range of its ID.
-	 * It is ugly now because we have to hardcode the range here, but we will
-	 * find a way to express it in the input data finally.  
-	 * 
-	 * @param type
-	 * @param channel
-	 * @return range of ID
-	 */
-	private int[] getRangeByTypeAndChannel(String type, int channel) {
-		int[] range = new int[2];
-
-		if (type.equals("ce")) {
-			range[0] = 1;
-			range[1] = 800;
-		} else if (type.equals("ci")) {
-			range[0] = 801;
-			range[1] = 1000;
-		} else if (type.equals("tc")) {
-			range[0] = 1001;
-			range[1] = 1011;
-		} else if (type.equals("stn")) {
-			range[0] = 1012;
-			range[1] = 1031;
-		} else if (type.equals("strd1")) {
-			range[0] = 1032;
-			range[1] = 1989;
-		} else if (type.equals("strd2")) {
-			range[0] = 1990;
-			range[1] = 2468;
-		} else if (type.equals("gpe")) {
-			range[0] = 2469;
-			range[1] = 2528;
-		} else if (type.equals("gpi")) {
-			range[0] = 2529;
-			range[1] = 2572;
-		}
-
-		range[0] += (channel - 1) * this.total_in_onechannel;
-		range[1] += (channel - 1) * this.total_in_onechannel;
-
-		return range;
-	}
-
-	/**
-	 * Build connections from the current type of neurons to its outgoing neighbors and
-	 * build connections from the current channel to other channels (only if the type of neuron
-	 * is 'stn'). 
-	 * 
-	 * @param outgoing_type outgoing neuron type
-	 * @param prob_weight connection probability and synaptic weight
-	 * @param sb StringBuilder used to hold the connections
-	 * @param channel the current channel
-	 */
-	private void buildConnection(String outgoing_type, String prob_weight, 
-			StringBuilder sb, int current_channel) {
-		int[] range = getRangeByTypeAndChannel(outgoing_type, current_channel);
-		String[] elems = prob_weight.split("~");
-		float prob = Float.parseFloat(elems[0]);
-		float weight = Float.parseFloat(elems[1]);
-
-		// Build connections inside the given channel
-		for (int j = range[0]; j <= range[1]; j++) {
-			if (randn.nextFloat() <= prob) {
-				String edge = j+":"+String.format("%.2f",weight*randn.nextFloat());
-				sb.append(edge).append(',');
-			}
-		}
 		
-		// Build connection between channels only when current
-		// neuron type is 'stn'. connection is from 'stn' in the current channel
-		// to 'gpe' and 'gpi' of all other channels.
-		if (this.type.equals("stn")) {
-			for (int channel = 1; channel <= this.num_channels; ++channel) {
-				if (channel != current_channel) { // ignore the current channel
-					
-					/* connections to gpe */
-					int[] range_gpe = getRangeByTypeAndChannel("gpe", channel);
-					for (int j = range_gpe[0]; j <= range_gpe[1]; j++) {
-						if (randn.nextFloat() <= this.StnDiffuseProb) {
-							String edge = j+":"+String.format("%.2f", 
-									this.DiffuseWeight*randn.nextFloat());
-							sb.append(edge).append(',');
-						}
-					}
-					
-					/* connections to gpi */
-					int[] range_gpi = getRangeByTypeAndChannel("gpi", channel);
-					for (int j = range_gpi[0]; j <= range_gpi[1]; j++) {
-						if (randn.nextFloat() <= this.StnDiffuseProb) {
-							String edge = j+":"+String.format("%.2f", 
-									this.DiffuseWeight*randn.nextFloat());
-							sb.append(edge).append(',');
-						}
-					}
-				}
-			}
-		}
 	}
 
 	/**
-	 * Generate a neuron (parameters and its internal state).
+	 * Return a NeuronWritable given a channel number
 	 * 
-	 * @param type neuron type
-	 * @param channel the channel this neuron belongs to
-	 * @return an instance of NeuronWritable
+	 * @param channel the channel number where the neuron is
+	 * @param params the parameter list got from xml configuration.
+	 * @return a NeuronWritable that holds internal data of a neuron.
 	 */
-	private NeuronWritable generateNeuron(String type, int channel) {
+	private NeuronWritable getNeuronWritable( int channel, NodeList params ) {
 		NeuronWritable neuron = new NeuronWritable();
 		float randf1 = randn.nextFloat();
 		float randf2 = randn.nextFloat();
-
-		/*
-		 * 4 parameters differ as the type of neuron changes
-		 */
-		if (type.equals("ce")) {
-			neuron.param_a = (float) 0.02;
-			neuron.param_b = (float) 0.2;
-			neuron.param_c = -65 + 15 * randf1 * randf1;
-			neuron.param_d = 8 - 6 * randf2 * randf2;
-		} else if (type.equals("ci")) {
-			neuron.param_a = (float) (0.2 + 0.08 * randf1);
-			neuron.param_b = (float) (0.25 - 0.05 * randf2);
-			neuron.param_c = -65;
-			neuron.param_d = 2;
-		} else if (type.equals("tc")) {
-			neuron.param_a = (float) 0.002;
-			neuron.param_b = (float) 0.25;
-			neuron.param_c = -65 + 15 * randf1 * randf1;
-			neuron.param_d = (float) 0.05 * randf2 * randf2;
-		} else if (type.equals("stn")) {
-			neuron.param_a = (float) 0.005;
-			neuron.param_b = (float) 0.265;
-			neuron.param_c = -65 + 15 * randf1 * randf1;
-			neuron.param_d = 2 * randf2 * randf2;
-		} else if (type.equals("strd1")) {
-			neuron.param_a = (float) 0.01 + (float) 0.01 * randf1;
-			neuron.param_b = (float) 0.275 - (float) 0.05 * randf2;
-			neuron.param_c = -65;
-			neuron.param_d = 2;
-		} else if (type.equals("strd2")) {
-			neuron.param_a = (float) 0.01 + (float) 0.01 * randf1;
-			neuron.param_b = (float) 0.275 - (float) 0.05 * randf2;
-			neuron.param_c = -65;
-			neuron.param_d = 2;
-		} else if (type.equals("gpe")) {
-			neuron.param_a = (float) 0.005 + (float) 0.001 * randf1;
-			neuron.param_b = (float) 0.585 - (float) 0.05 * randf2;
-			neuron.param_c = -65;
-			neuron.param_d = 4;
-		} else if (type.equals("gpi")) {
-			neuron.param_a = (float) 0.005 + (float) 0.001 * randf1;
-			neuron.param_b = (float) 0.32 - (float) 0.05 * randf2;
-			neuron.param_c = -65;
-			neuron.param_d = 2;
+		float a, b, c, d, f1, f2;
+		
+		for (int i = 0; i < params.getLength(); ++i) {
+			Element param = (Element) params.item(i);
+			char name = param.getAttribute("name").charAt(0);
+			f1 = Float.parseFloat(param.getAttribute("factor1"));
+			f2 = Float.parseFloat(param.getAttribute("factor2"));
+			switch (name) {
+			case 'a':
+				neuron.param_a = f1 + f2 * randf1;
+				break;
+			case 'b':
+				neuron.param_b = f1 - f2 * randf2;
+				break;
+			case 'c':
+				neuron.param_c = f1 + f2 * randf1 * randf1;
+				break;
+			case 'd':
+				neuron.param_d = f1 - f2 * randf2 * randf2;
+				break;
+			}
 		}
-
-		neuron.potential = -65;
+		
+		neuron.potential = this.potential;
 		neuron.recovery = neuron.potential * neuron.param_b;
-
-		neuron.type.set(type);
-		neuron.synaptic_sum = 0;
-		neuron.fired = 'N';
-		neuron.time = 0;
+		neuron.type.set(this.type);
+		neuron.synaptic_sum = 0; // initial synaptic summation: 0
+		neuron.fired = 'N'; // initial firing status: Not fired
+		neuron.time = 0; // initial time step: 0 ms
 		neuron.channel = channel;
-
+		
 		return neuron;
+	}
+	
+	/**
+	 * Extract 'connection' tag from root element.
+	 * 
+	 * @param root root element of the xml input.
+	 * @return connections mapping from neuron type to connection probability & strength.
+	 */
+	private Map<String, float[]> getConnenctions( Element root ) {
+		Map<String, float[]> conns = new HashMap<String, float[]>();
+		
+		Element connection = (Element) root.getElementsByTagName("connection").item(0);
+		NodeList tos = connection.getElementsByTagName("to");
+		for (int i = 0; i < tos.getLength(); ++i) {
+			Element to = (Element) tos.item(i);
+			String type = to.getAttribute("type");
+			float[] prob_strength = new float[2];
+			prob_strength[0] = Float.parseFloat(to.getAttribute("probability"));
+			prob_strength[1] = Float.parseFloat(to.getAttribute("strength"));
+
+			conns.put(type, prob_strength);
+		}
+		
+		return conns;
+	}
+	
+	/**
+	 * Extract "connection_channel" tag from 'global' tag.
+	 * 
+	 * @param global 'global' tag
+	 * @return channel connection mapping
+	 */
+	private Map<String, ArrayList<String>> getChannelConnections( Element global ) {
+		Map<String, ArrayList<String>> channel_conns = new HashMap<String, ArrayList<String>>();
+		
+		NodeList conns = global.getElementsByTagName("channel_connections");
+		for (int i = 0; i < conns.getLength(); ++i) {
+			Element conn = (Element) conns.item(i);
+			String source = conn.getAttribute("from");
+			ArrayList<String> targets = new ArrayList<String>();
+			
+			NodeList tos = conn.getElementsByTagName("to");
+			for (int j = 0; j < tos.getLength(); ++j) {
+				Element to = (Element) tos.item(j);
+				targets.add(to.getAttribute("type"));
+			}
+			
+			channel_conns.put(source, targets);
+		}
+		
+		return channel_conns;
+	}
+	
+	private Map<String, int[]> getRanges( Element global ) {
+		Map<String, int[]> type_ranges = new HashMap<String, int[]>();
+		
+		NodeList ranges = global.getElementsByTagName("range");
+		for (int i = 0; i < ranges.getLength(); ++i) {
+			int[] start_end = new int[2];
+			Element range = (Element) ranges.item(i);
+			start_end[0] = Integer.parseInt( range.getAttribute("start") );
+			start_end[1] = Integer.parseInt( range.getAttribute("end") );
+			type_ranges.put( range.getAttribute("type"), start_end );
+		}
+		
+		return type_ranges;
 	}
 }

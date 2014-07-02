@@ -24,7 +24,7 @@ def create_output(neuron_type, start_id, end_id, num_per_partition, global_root)
         neuron.set( 'end_id', str(end) )
 
         root.append( global_root )
-        tree.write( path )
+        tree.write( path, encoding='utf-8' )
     
 
 if __name__ == '__main__':

@@ -6,7 +6,9 @@ import org.apache.hadoop.io.SequenceFile.CompressionType;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.compress.SnappyCodec;
+import org.apache.hadoop.mapred.TextOutputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.Job;
@@ -45,10 +47,10 @@ public class NeuronInput extends Configured implements Tool {
 		
 		job.setMapperClass(NeuronInputMapper.class);
 		job.setNumReduceTasks(0); // This is a mapper only job.
-		
+				
 		job.setOutputKeyClass(NullWritable.class);
 		job.setOutputValueClass(Text.class);
-		
+
 		return job.waitForCompletion(true) ? 0 : -1;
 	}
 	

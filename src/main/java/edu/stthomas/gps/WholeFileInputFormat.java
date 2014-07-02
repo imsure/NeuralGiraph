@@ -4,6 +4,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.InputSplit;
@@ -23,7 +24,7 @@ import java.io.*;
  * Input format for reading the whole file as value.
  */
 public class WholeFileInputFormat 
-extends FileInputFormat<NullWritable, BytesWritable> {
+extends FileInputFormat<NullWritable, Text> {
 
 	@Override
 	protected boolean isSplitable(JobContext context, Path file) {
@@ -31,7 +32,7 @@ extends FileInputFormat<NullWritable, BytesWritable> {
 	}
 	
 	@Override
-	public RecordReader<NullWritable, BytesWritable> createRecordReader(
+	public RecordReader<NullWritable, Text> createRecordReader(
 			InputSplit split, TaskAttemptContext context) 
 					throws IOException, InterruptedException {
 		WholeFileRecordReader reader = new WholeFileRecordReader();
@@ -39,10 +40,10 @@ extends FileInputFormat<NullWritable, BytesWritable> {
 		return reader;
 	}
 	
-	static class WholeFileRecordReader extends RecordReader<NullWritable, BytesWritable> {
+	static class WholeFileRecordReader extends RecordReader<NullWritable, Text> {
 		private FileSplit fileSplit;
 		private Configuration conf;
-		private BytesWritable value = new BytesWritable();
+		private Text value = new Text();
 		private boolean processed = false;
 		
 		@Override
@@ -55,7 +56,7 @@ extends FileInputFormat<NullWritable, BytesWritable> {
 		@Override
 		public boolean nextKeyValue() throws IOException, InterruptedException {
 			if (!processed) {
-				byte[] contents = new byte[(int) fileSplit.getLength()];
+				byte[] contents = new byte[((int) fileSplit.getLength())];
 				Path file = fileSplit.getPath();
 				FileSystem fs = file.getFileSystem(conf);
 				FSDataInputStream in = null;
@@ -63,7 +64,7 @@ extends FileInputFormat<NullWritable, BytesWritable> {
 				try {
 					in = fs.open(file);
 					IOUtils.readFully(in, contents, 0, contents.length);
-					value.set(contents, 0, contents.length);
+					value.set(contents);
 				} finally {
 					IOUtils.closeStream(in);
 				}
@@ -81,7 +82,7 @@ extends FileInputFormat<NullWritable, BytesWritable> {
 		}
 		
 		@Override 
-		public BytesWritable getCurrentValue() throws IOException, InterruptedException {
+		public Text getCurrentValue() throws IOException, InterruptedException {
 			return value;
 		}
 		

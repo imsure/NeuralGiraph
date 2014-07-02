@@ -12,10 +12,14 @@
     <parameter factor1="0" factor2="-0.05" name="d" />
   </neuron>
 
+  <connection>
+    
+    <to probability="1" strength="0" type="tc" />
+  </connection>
+
 <global channel="2" total="2572" unit="1000">
   
-  <channel_connection>
-    <from type="stn" />
+  <channel_connection diffuse_prob="0.5" diffuse_weight="0.35" from="stn">
     <to type="gpe" />
     <to type="gpi" />
   </channel_connection>
