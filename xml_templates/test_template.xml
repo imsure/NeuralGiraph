@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- For test only! Remove it for real simulation! -->
+<!-- A partition of the neural network, the partition contains "test" neurons -->
+<partition>
+  <!-- Description of the neurons inside the partition -->
+  <!-- start_id and end_id will be filled by Python parser -->
+  <neuron type="test" start_id="xxx" end_id="yyy" potential="65">
+    <!-- a = factor1 + factor2 * random_number(0~1) -->
+    <parameter name="a" factor1="0.002" factor2="0" />
+    <!-- b = factor1 - factor2 * random_number(0~1) -->
+    <parameter name="b" factor1="0.25" factor2="0" />
+    <!-- c = factor1 + factor2 * random_number(0~1)^2 -->
+    <parameter name="c" factor1="-65" factor2="15" />
+    <!-- d = factor1 - factor2 * random_number(0~1)^2 -->
+    <parameter name="d" factor1="0" factor2="-0.05" />
+  </neuron>
+
+  <connection>
+    <!-- Describes types of neurons "tc" connects to. 'tc' actually doesn't connect to anyone,
+	 this is just a place holder for the ease of implementation. -->
+    <to type="tc" probability="1" strength="1" />
+  </connection>
+
+</partition>

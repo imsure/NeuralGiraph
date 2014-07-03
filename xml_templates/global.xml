@@ -3,11 +3,17 @@
 <!-- Describes the global range partitioning of the neural network. -->
 
 <!-- total number of neurons, number of channels, maximum number of neurons in each partition -->
-<global total="2572" channel="2" unit="1000">
+<global total="2600" channel="2" unit="1000">
   <!-- how channels are connected -->
   <channel_connection from="stn" diffuse_prob="0.5" diffuse_weight="0.35">
     <to type="gpe"></to>
     <to type="gpi"></to>
+  </channel_connection>
+
+  <!-- For test only! Remove it for real simulation! -->
+  <channel_connection from="tc" diffuse_prob="0.5" diffuse_weight="0.35">
+    <to type="stn"></to>
+    <to type="strd1"></to>
   </channel_connection>
 
   <!-- range partitioning of channel 1 -->
@@ -19,5 +25,7 @@
   <range type="strd2" start="1990" end="2468" />
   <range type="gpe" start="2469" end="2528" />
   <range type="gpi" start="2529" end="2572" />
+  <!-- For test only! Remove it for real simulation! -->
+  <range type="test" start="2573" end="2600" />
 
 </global>

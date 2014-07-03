@@ -1,26 +1,22 @@
 <partition>
   
   
-  <neuron end_id="800" potential="65" start_id="1" type="ce">
+  <neuron end_id="2600" potential="65" start_id="2573" type="test">
     
-    <parameter factor1="0.02" factor2="0" name="a" />
+    <parameter factor1="0.002" factor2="0" name="a" />
     
-    <parameter factor1="0.2" factor2="0" name="b" />
-    	  
+    <parameter factor1="0.25" factor2="0" name="b" />
+    
     <parameter factor1="-65" factor2="15" name="c" />
     
-    <parameter factor1="8" factor2="6" name="d" />
+    <parameter factor1="0" factor2="-0.05" name="d" />
   </neuron>
 
   <connection>
     
-    <to probability="1" strength="0.5" type="ce" />
-    <to probability="1" strength="0.5" type="ci" />
-    <to probability="0.25" strength="0.25" type="stn" />
-    <to probability="0.5" strength="0.2" type="strd1" />
-    <to probability="0.5" strength="0.2" type="strd2" />
+    <to probability="1" strength="1" type="tc" />
   </connection>
-  
+
 <global channel="2" total="2600" unit="1000">
   
   <channel_connection diffuse_prob="0.5" diffuse_weight="0.35" from="stn">

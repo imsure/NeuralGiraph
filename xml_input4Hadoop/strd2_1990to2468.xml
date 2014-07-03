@@ -17,11 +17,17 @@
     <to probability="1" strength="-2" type="gpe" />
     <to probability="0.75" strength="-1" type="strd2" />
   </connection>
-<global channel="2" total="2572" unit="1000">
+<global channel="2" total="2600" unit="1000">
   
   <channel_connection diffuse_prob="0.5" diffuse_weight="0.35" from="stn">
     <to type="gpe" />
     <to type="gpi" />
+  </channel_connection>
+
+  
+  <channel_connection diffuse_prob="0.5" diffuse_weight="0.35" from="tc">
+    <to type="stn" />
+    <to type="strd1" />
   </channel_connection>
 
   
@@ -33,5 +39,7 @@
   <range end="2468" start="1990" type="strd2" />
   <range end="2528" start="2469" type="gpe" />
   <range end="2572" start="2529" type="gpi" />
+  
+  <range end="2600" start="2573" type="test" />
 
 </global></partition>
