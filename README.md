@@ -19,14 +19,38 @@ at the [University of St. Thomas](http://www.stthomas.edu/) by
 ### Generate XML configuration files
 
 `python xml_templates_parser.py`
+
 A directory called 'xml_input4Hadoop' will be generated under the project home.
 
 ### Compile & upload to Hadoop cluster
 
+Modify *upload.sh* first with appropriate user name and Hadoop cluster name.
+
+`mvn install`
+
+This command will compile the project and upload necessary files to Hadoop cluster
+in the directory *giraph* under $HOME
 
 ### Neural network generation with MapReduce
 
+ssh into your Hadoop cluster:
+
+`cd giraph`
+`chmod +x *.sh`
+`./input.sh`
+
+The neural network will be generated in *neuron_input* on HDFS.
+
 ### Run Giraph job for modeling
+
+Delete _logs files generated at the previous step, otherwise Giraph will take it as
+input and an error would occur.
+
+`hadoop fs -rm -r neuron_input/_logs`
+
+Run Giraph job
+
+`./run.sh`
 
 ### Post analysis
 
