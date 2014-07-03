@@ -23,6 +23,8 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
  * The Mapper class is used to generate input data for 
  * a neuron network based on the xml inputs.
  *
+ * Input value is the entire xml configuration;
+ * Output value is a partition of the neural network in Hadoop's Text format.
  */
 public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, Text>
 {
@@ -58,14 +60,8 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 	}
 
 	/**
-	 * Each map method takes a line of metadata about a specific type of neuron.
-	 * The meta data is define as:
-	 * [start id (channel 1), end id (channel 1), total number of neurons in one channel, 
-	 * number of channel, neuron type, {connections:neuron type:probabilty of connection~weight}]
-	 * 
-	 * Examples like:
-	 * 1,800,2579,2,ce,ce:1~0.5,ci:1~0.5,stn:0.5~0.5,strd1:0.5~0.5,strd2:0.5~0.5
-	 * 801,1000,2579,2,ci,ce:1~-1,ci:1~-1
+	 * Parse the whole xml configuration file and output the 
+	 * partition of the neural network to HDFS.
 	 */
 	@Override
 	public void map(NullWritable key, Text value, Context context) 
@@ -108,7 +104,7 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 			this.num_channels = Integer.parseInt( global.getAttribute("channel") );
 			this.total_in_onechannel = Integer.parseInt( global.getAttribute("total") );
 			channel_conns = this.getChannelConnections(global);
-			type_ranges = this.getRanges(global);
+			type_ranges = this.getRangeMap(global);
 
 			/*
 			 * Build up partition of the neural network.
@@ -326,7 +322,13 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 		return channel_conns;
 	}
 
-	private Map<String, int[]> getRanges( Element global ) {
+	/**
+	 * Get the Map from neuron types to ID range.
+	 * 
+	 * @param global 'global' tag extracted from xml input
+	 * @return the Map from neuron types to ID ranges
+	 */
+	private Map<String, int[]> getRangeMap( Element global ) {
 		Map<String, int[]> type_ranges = new HashMap<String, int[]>();
 
 		NodeList ranges = global.getElementsByTagName("range");

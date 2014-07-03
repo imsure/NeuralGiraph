@@ -45,8 +45,9 @@ NeuronWritable, FloatWritable, FloatWritable> {
 	private Random randn = new Random();
 	private FloatWritable weight = new FloatWritable();
 
-	/** Number of supersteps for this test */
-	public static final int MAX_SUPERSTEPS = 35;
+	/** Number of supersteps for this test. */
+	// public static final int MAX_SUPERSTEPS = 35;
+	
 	/** Logger */
 	private static final Logger LOG =
 			Logger.getLogger(NeuronVertex.class);
