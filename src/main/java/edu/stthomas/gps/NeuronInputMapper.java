@@ -21,7 +21,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 /**
  * The Mapper class is used to generate input data for 
- * a neuron network based on the metadata provided.
+ * a neuron network based on the xml inputs.
  *
  */
 public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, Text>
@@ -30,8 +30,8 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 	private Text filename = new Text();
 	private Random randn = new Random();
 
-	private int start_id_channel1;
-	private int end_id_channel1;
+	private int start_id;
+	private int end_id;
 	private int total_in_onechannel; // total number of neurons in one channel
 	private int num_channels; // number of channels
 	private String type; // the current type neuron the map is processing
@@ -93,8 +93,8 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 			 */
 			Element neuron_tag = (Element) doc.getElementsByTagName("neuron").item(0);
 			this.type = neuron_tag.getAttribute("type");
-			this.start_id_channel1 = Integer.parseInt( neuron_tag.getAttribute("start_id") );
-			this.end_id_channel1 = Integer.parseInt( neuron_tag.getAttribute("end_id") );
+			this.start_id = Integer.parseInt( neuron_tag.getAttribute("start_id") );
+			this.end_id = Integer.parseInt( neuron_tag.getAttribute("end_id") );
 			this.potential = Float.parseFloat( neuron_tag.getAttribute("potential") );
 			NodeList parameters = neuron_tag.getElementsByTagName("parameter");
 
@@ -117,9 +117,10 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 			for (int j = 1; j <= this.num_channels; ++j) {
 				int channel = j;
 				// ID range for the current 'channel'
-				int[] range = this.getRange(this.type, channel); 
+				this.start_id += (channel - 1) * this.total_in_onechannel;
+				this.end_id += (channel - 1) * this.total_in_onechannel;
 
-				for (int i = range[0]; i <= range[1]; ++i) {
+				for (int i = this.start_id; i <= this.end_id; ++i) {
 					StringBuilder sb = new StringBuilder();
 					sb.append(i).append(';'); // Neuron ID
 					neuron = this.getNeuronWritable(channel, parameters);
@@ -134,7 +135,6 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 					}
 	
 					buildChannelConnection( channel, sb );
-					
 					
 					output.set( sb.toString().substring(0, sb.length()-1) ); // remove the trailing ','
 					context.write(NullWritable.get(), output);

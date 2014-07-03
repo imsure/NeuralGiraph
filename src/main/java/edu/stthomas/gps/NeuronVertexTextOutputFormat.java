@@ -10,6 +10,12 @@ import org.apache.giraph.io.formats.TextVertexOutputFormat;
 
 import java.io.*;
 
+/**
+ * The class defines how to output the NeuronVertex to HDFS.
+ * 
+ * @author imsure
+ *
+ */
 public class NeuronVertexTextOutputFormat 
 extends TextVertexOutputFormat<IntWritable, NeuronWritable, FloatWritable> {
 

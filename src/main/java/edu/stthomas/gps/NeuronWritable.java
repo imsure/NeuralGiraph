@@ -9,6 +9,13 @@ import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.Text;
 import java.util.*;
 
+/**
+ * NeuronWritable holds a neuron's internal data.
+ * 
+ * @author imsure
+ *
+ */
+
 public class NeuronWritable implements Writable {
 
 	public Text type;
