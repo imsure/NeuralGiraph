@@ -135,7 +135,8 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 	
 					buildChannelConnection( channel, sb );
 					
-					output.set(sb.toString());
+					
+					output.set( sb.toString().substring(0, sb.length()-1) ); // remove the trailing ','
 					context.write(NullWritable.get(), output);
 				}
 			}
@@ -168,6 +169,12 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 		return range;
 	}
 
+	/**
+	 * Build connections between channels. (from 'channel' to other channels)
+	 * 
+	 * @param channel the source channel
+	 * @param sb StringBuilder to hold the connections
+	 */
 	private void buildChannelConnection( int channel, StringBuilder sb ) {
 		for (int i = 0; i < this.channel_conns.size(); ++i) {
 			ChannelConnection cc = this.channel_conns.get(i);
@@ -202,10 +209,10 @@ public class NeuronInputMapper extends Mapper<NullWritable, Text, NullWritable, 
 	/**
 	 * Construct edges from this.type to 'target', in 'channel'.
 	 * 
-	 * @param target
-	 * @param prob
-	 * @param strength
-	 * @param sb
+	 * @param target target type
+	 * @param prob connection probability
+	 * @param strength connection strength
+	 * @param sb StringBuilder to hold the edges
 	 */
 	private void constructEdges( String target, float prob,
 			float strength, int channel, StringBuilder sb ) {
