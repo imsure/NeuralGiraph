@@ -11,7 +11,7 @@ at the [University of St. Thomas](http://www.stthomas.edu/) by
 
 + Maven 3
 + CDH4
-+ Giraph
++ Giraph 1.0.0
 + Java 1.6
 + Python 2.7 or higher
 + R
@@ -62,7 +62,7 @@ Run Giraph job
 + post-analysis/hive/firing_pattern.hql: extracting fired neurons
 + post-analysis/hive/firing_rates.hql: extracting firing rates
 
-### Plotting
+#### Plotting
 
 + post-analysis/plot/graphs.R: plotting firing patterns
 + post-analysis/plot/channel_plot.R: plotting firing patterns for multiple channels
