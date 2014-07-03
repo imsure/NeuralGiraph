@@ -54,3 +54,15 @@ Run Giraph job
 
 `./run.sh`
 
+### Post analysis
+
+#### Data analysis
+
++ post-analysis/hive/create_table.hql: creating hive table from Giraph's output
++ post-analysis/hive/firing_pattern.hql: extracting fired neurons
++ post-analysis/hive/firing_rates.hql: extracting firing rates
+
+### Plotting
+
++ post-analysis/plot/graphs.R: plotting firing patterns
++ post-analysis/plot/channel_plot.R: plotting firing patterns for multiple channels
