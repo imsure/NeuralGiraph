@@ -1,7 +1,9 @@
 #!/bin/sh
 
-hadoop fs -rm -r neuron_meta
-hadoop fs -rm -r neuron_input
-hadoop fs -put neuron_meta
+# Generate neural network as input to Giraph job for modeling.
 
-hadoop jar giraph_neuron_graph-1.0.jar edu.stthomas.gps.NeuronInput -DEPROB=0.2 -DIPROB=0.3 neuron_meta neuron_input
+hadoop fs -rm -r neuron_input
+hadoop fs -rm -r xml_input4Hadoop
+hadoop fs -put xml_input4Hadoop
+
+hadoop jar giraph_neuron_graph-1.0.jar edu.stthomas.gps.NeuronInput xml_input4Hadoop neuron_input
