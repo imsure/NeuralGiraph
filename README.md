@@ -1,7 +1,7 @@
 ## Large-scale neural network modeling using Giraph
 
 We use [Giraph](http://giraph.apache.org) to model large-scale neural network on the
-[Hadoop](hadoop.apache.org) cluster deployed
+[Hadoop](http://hadoop.apache.org) cluster deployed
 at the [University of St. Thomas](http://www.stthomas.edu/) by
 [Department of Graduate Programs in Software](http://www.stthomas.edu/gradsoftware/).
 
@@ -36,7 +36,9 @@ in the directory *giraph* under $HOME
 ssh into your Hadoop cluster:
 
 `cd giraph`
+
 `chmod +x *.sh`
+
 `./input.sh`
 
 The neural network will be generated in *neuron_input* on HDFS.
@@ -51,8 +53,4 @@ input and an error would occur.
 Run Giraph job
 
 `./run.sh`
-
-### Post analysis
-
-
 
