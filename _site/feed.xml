@@ -5,8 +5,8 @@
     <description>Welcome! The site contains documents about our research project. We are interested in modeling large-scale neural network with open source big data platform Hadoop. Based on Hadoop, we use both MapReduce and Giraph to explore graph algorithms which can process neural network efficiently.</description>
     <link>http://imsure.github.io/NeuralGiraph//</link>
     <atom:link href="http://imsure.github.io/NeuralGiraph//feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 11 Jul 2014 17:21:18 -0500</pubDate>
-    <lastBuildDate>Fri, 11 Jul 2014 17:21:18 -0500</lastBuildDate>
+    <pubDate>Fri, 11 Jul 2014 17:34:55 -0500</pubDate>
+    <lastBuildDate>Fri, 11 Jul 2014 17:34:55 -0500</lastBuildDate>
     <generator>Jekyll v1.5.1</generator>
     
       <item>

@@ -10,12 +10,13 @@ layout: default
     {% for post in site.posts %}
       <li>
         <span class="post-date">{{ post.date | date: "%b %-d, %Y" }}</span>
-        <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+        <a class="post-link" href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
       </li>
     {% endfor %}
   </ul>
 
-  <p class="rss-subscribe">Check out our paper at <a href="{{ "/neuron_hadoop_final.pdf" | prepend: site.baseurl }}">
+  <p class="rss-subscribe">Check out our paper at <a href="{{
+      site.baseurl }}{{ "/neuron_hadoop_final.pdf" }}">
       Large-scale Neural Modeling in MapReduce and Giraph</a></p>
 
 </div>
