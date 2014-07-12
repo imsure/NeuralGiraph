@@ -28,8 +28,7 @@ We extend the model to support:
  - multiple channels in the neural network
 
 
-| ![firing-1000]({{ site.baseurl }}/assets/firing-1000.svg) |
-   ![voltage]({{ site.baseurl }}/assets/voltage.jpg) |
+| ![firing-1000]({{ site.baseurl }}/assets/firing-1000.svg) | ![voltage]({{ site.baseurl }}/assets/voltage.jpg) |
 
 
 ## A Neural Network is a Graph Structure
