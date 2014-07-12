@@ -24,11 +24,12 @@ threshold value, the neuron would send synaptic currents to its
 outgoing neighbors.
 
 We extend the model to support:
+
  - more types of neurons
  - multiple channels in the neural network
 
 
-| ![firing-1000]({{ site.baseurl }}/assets/firing-1000.svg) | ![voltage]({{ site.baseurl }}/assets/voltage.jpg) |
+| ![firing-1000]({{ site.baseurl }}/assets/plots-1000-network.svg)
 
 
 ## A Neural Network is a Graph Structure
