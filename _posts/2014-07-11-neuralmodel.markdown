@@ -23,16 +23,22 @@ the membrane, either positive or negative. If the voltage reaches to a
 threshold value, the neuron would send synaptic currents to its
 outgoing neighbors.
 
+![firing-1000]({{ site.baseurl }}/assets/plots-1000-network.svg)
+
+The above figures are showing some simulation results of a small
+neural network with 1000 neurons. These plots are statistically
+identical with the results given by
+[Izhikevich's paper](http://www.izhikevich.org/publications/spikes.pdf)
+
+## A Neural Network with more types and multiple channels
+
 We extend the model to support:
 
  - more types of neurons
  - multiple channels in the neural network
 
+Below is a detailed illustration of how a neural network with two
+channels, including channel connections, looks like as a matrix.
 
-| ![firing-1000]({{ site.baseurl }}/assets/plots-1000-network.svg)
-
-
-## A Neural Network is a Graph Structure
-
-
-
+![matrix two channels]({{ site.baseurl }}/assets/matrix-two-channels.svg)
+ 
