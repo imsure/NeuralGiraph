@@ -28,19 +28,19 @@ it is a effective model for large-scale iterative graph processing.
 
 ![basic work flow](/assets/work-flow.svg)
 
-_phase one: generating neural network_
+**phase one: generating neural network**
 
 The neural network to be processed is configurable by a set of XML
 templates. These templates then go through a Python parser which will
 create the configurations in XML format and feed it to a MapReduce
 job to generate the neural network in parallel. 
 
-*phase two: modeling with [Giraph]*
+**phase two: modeling with [Giraph]**
 
 The neural network generated in phase one is then passed to a [Giraph]
 job for simulation.
 
-*phase three: post analysis*
+**phase three: post analysis**
 
 The results output by phase two are then used for post analysis, such
 as firing rate computation and firing plots.
