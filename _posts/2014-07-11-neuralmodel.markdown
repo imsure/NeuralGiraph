@@ -42,5 +42,5 @@ channels, including channel connections, looks like as a matrix.
 
 ![matrix two channels]({{ site.baseurl }}/assets/matrix-two-channels.svg)
 
-![firing two channels]({{ site.baseurl }}/assets/channels_firing.png)
+![firing two channels]({{ site.baseurl }}/assets/channels_firing.png =800x600)
  
