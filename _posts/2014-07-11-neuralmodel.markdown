@@ -13,17 +13,23 @@ presented by [Izhikevich](http://www.izhikevich.org/). The model was
 used to simulate tens of thousands of spiking cortical neurons in real
 time.
 
-### How model works
+## How model works
 
 ![spiking model]({{ site.baseurl }}/assets/spiking-model.svg)
 
+A neuron would receive synaptic currents from its incoming neighbors,
+these currents adding up together would trigger a voltage change in
+the membrane, either positive or negative. If the voltage reaches to a
+threshold value, the neuron would send synaptic currents to its
+outgoing neighbors.
+
 We extend the model to support:
-
- - more types of neurons except cortical neurons
+ - more types of neurons
  - multiple channels in the neural network
- - large-scale neural network simulation (hundreds of thoudsands of neurons)
 
-### Simulation results
+
+| ![firing-1000]({{ site.baseurl }}/assets/firing-1000.svg) |
+   ![voltage]({{ site.baseurl }}/assets/voltage.jpg) |
 
 
 ## A Neural Network is a Graph Structure
