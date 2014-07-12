@@ -15,6 +15,5 @@ have seen this figure in the previous post,
 the neural network is represented as a `N*N` square matrix, where a
 cell value
 
-![matrix two channels]({{ site.baseurl
- }}/assets/matrix-two-channels.svg)
+![matrix two channels]({{ site.baseurl }}/assets/matrix-two-channels.svg)
  
