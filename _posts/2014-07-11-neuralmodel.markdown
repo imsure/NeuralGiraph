@@ -15,16 +15,16 @@ time.
 
 ### How model works
 
-![alt spiking model]({{ site.baseurl }}/assets/spiking-model.svg)
+![spiking model]({{ site.baseurl }}/assets/spiking-model.svg)
 
+We extend the model to support:
+
+ - more types of neurons except cortical neurons
+ - multiple channels in the neural network
+ - large-scale neural network simulation (hundreds of thoudsands of neurons)
 
 ### Simulation results
 
-We extend the model to support:
-- more types of neurons except cortical neurons.
-- multiple channels in the neural network.
-- large-scale neural network simulation (hundreds of thoudsands of
-  neurons)
 
 ## A Neural Network is a Graph Structure
 
