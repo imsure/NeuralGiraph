@@ -13,7 +13,7 @@ structure.
 One common way to represent a graph is via an adjacency matrix. As we
 have seen the below figure in the [previous post]({{ site.baseurl }}{% post_url 2014-07-11-neuralmodel %}),
 the neural network is represented as a `N*N` square matrix, where a
-cell value 
+cell value M<sub>ij</sub>
 
 ![matrix two channels]({{ site.baseurl }}/assets/matrix-two-channels.svg)
  
