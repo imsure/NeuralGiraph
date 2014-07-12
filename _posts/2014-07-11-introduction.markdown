@@ -28,7 +28,7 @@ it is a effective model for large-scale iterative graph processing.
 
 ![basic work flow](/assets/work-flow.svg)
 
-*phase one: generating neural network*
+_phase one: generating neural network_
 
 The neural network to be processed is configurable by a set of XML
 templates. These templates then go through a Python parser which will
