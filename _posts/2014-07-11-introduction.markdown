@@ -26,7 +26,7 @@ it is a effective model for large-scale iterative graph processing.
 
 ## Basic work flow
 
-![basic work flow](/assets/work-flow.svg)
+![basic work flow]({{ site.baseurl }}assets/work-flow.svg)
 
 **phase one: generating neural network**
 
