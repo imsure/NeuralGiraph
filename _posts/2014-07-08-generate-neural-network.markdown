@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Generate Neural Network with MapReduce"
+title:  "Generating Neural Network with MapReduce"
 date:   2014-07-08 21:58:57
 categories: documents
 ---
