@@ -21,7 +21,10 @@ Basically, there are two types of templates, one is `global.xml` which
 is used to describe the meta data associated with the neural network,
 such as `total number of neurons in one channel`, `number of
 channels`, `connections between channels` and `range partitioning by
-neuron types`, etc.
+neuron types`, etc. The other one is `neuron_type.xml` which is
+defined for each type of neurons.
+
+### global.xml
 
 {% highlight xml %}
 <!-- total number of neurons, number of channels, maximum number of -->
@@ -55,5 +58,42 @@ channel's `stn` neurons to other channels `gpe` and `gpi` neurons, the
 diffusion probability is `50%` and diffusion weight is `0.35`. The
 `range` tag defines the `start` and `end` ID for each type of neurons.
 
+### neuron_type.xml
 
+This varies by neuron types. For each type of neurons, there is one
+such file associated with that to describe meta data of that type.
+
+For example, for `Excitatory Neurons`, the file is called
+`ce_template.xml`, it looks like this:
+
+{% highlight xml %}
+<!-- A partition of the neural network, the partition contains "ce" -->
+<!-- neurons -->
+<partition>
+  <!-- Description of the neurons inside the partition -->
+  <!-- start_id and end_id will be filled by Python parser -->
+  <neuron type="ce" start_id="xxx" end_id="yyy" potential="65">
+    <!-- a = factor1 + factor2 * random_number(0~1) -->
+    <parameter name="a" factor1="0.02" factor2="0" />
+    <!-- b = factor1 - factor2 * random_number(0~1) -->
+    <parameter name="b" factor1="0.2" factor2="0" />
+    <!-- c = factor1 + factor2 * random_number(0~1)^2 -->
+    <parameter name="c" factor1="-65" factor2="15" />
+    <!-- d = factor1 - factor2 * random_number(0~1)^2 -->
+    <parameter name="d" factor1="8" factor2="6" />
+  </neuron>
+
+  <connection>
+    <!-- Describes types of neurons "ce" connects to, these are
+	 outgoing connection -->
+    <to type="ce" probability="1" strength="0.5" />
+    <to type="ci" probability="1" strength="0.5" />
+    <to type="stn" probability="0.25" strength="0.25" />
+    <to type="strd1" probability="0.5"
+	strength="0.2" />
+    <to type="strd2" probability="0.5" strength="0.2" />
+  </connection>
+
+</partition>
+{% endhighlight %}
 
