@@ -23,7 +23,7 @@ such as `total number of neurons in one channel`, `number of
 channels`, `connections between channels` and `range partitioning by
 neuron types`, etc.
 
-```xml
+```XML
 <!-- total number of neurons, number of channels, maximum number of -->
 <!-- neurons in each partition -->
 <global total="2600" channel="2" unit="1000">
