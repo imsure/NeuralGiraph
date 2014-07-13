@@ -41,3 +41,7 @@ membrane potential, input synaptic currents, firing flag, channel`
 `neuron ID-1:synaptic weight-1, neuron ID-2:synaptic weight-2,
 ... neuron ID-n:synaptic weight-n`
 
+In Hadoop, we used a custom writable `NeuronWritable` to store
+`meta-data associated with the neuron` and Hadoop's own Text format
+for adjacency list.
+
