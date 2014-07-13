@@ -26,7 +26,7 @@ neuron types`, etc.
 {% highlight xml %}
 <!-- total number of neurons, number of channels, maximum number of -->
 <!-- neurons in each partition -->
-<global total="2600" channel="2" unit="1000">
+<global total="2572" channel="2" unit="1000">
   <!-- how channels are connected -->
   <channel_connection from="stn" diffuse_prob="0.5" diffuse_weight="0.35">
     <to type="gpe"></to>
@@ -45,7 +45,15 @@ neuron types`, etc.
 </global>
 {% endhighlight %}
 
-
+Above is an example of `global.xml`. It defines a neural network with
+`two` channels, within each channel, there are `2572` neurons. In each
+partition of the network stored on `HDFS` (Hadoop Distributed File
+System), the maximum number of neurons is `1000`, such that each
+partition has a reasonable size for MapReduce to process in
+parallel. It also specifies the channel connection: from each
+channel's `stn` neurons to other channels `gpe` and `gpi` neurons, the
+diffusion probability is `50%` and diffusion weight is `0.35`. The
+`range` tag defines the `start` and `end` ID for each type of neurons.
 
 
 
