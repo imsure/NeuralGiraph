@@ -8,3 +8,4 @@ target
 output
 dependency-reduced-pom.xml
 *.swp
+.DS_Store
