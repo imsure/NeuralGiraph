@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Represent a Neural Network in Hadoop"
-date:   2014-07-12 21:58:57
+date:   2014-07-07 21:58:57
 categories: documents
 ---
 

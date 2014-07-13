@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Neural Model"
-date:   2014-07-11 21:58:57
+date:   2014-07-06 21:58:57
 categories: documents
 ---
 
