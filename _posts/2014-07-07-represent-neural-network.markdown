@@ -11,7 +11,7 @@ From computer science perspective, a neural network is a graph
 structure.
 
 One common way to represent a graph is via an adjacency matrix. As we
-have seen the below figure in the [previous post]({{ site.baseurl }}{% post_url 2014-07-06-neuralmodel %}),
+have seen the below figure in the [Neural Model]({{ site.baseurl }}{% post_url 2014-07-06-neuralmodel %}),
 the neural network is represented as a `N*N` square matrix, where a
 cell value *M<sub>ij</sub>* indicates and edge from vertex *n<sub>i</sub>*
 to vertex *n<sub>j</sub>*.
