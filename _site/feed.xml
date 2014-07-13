@@ -5,12 +5,117 @@
     <description>Welcome! The site contains documents about our research project. We are interested in modeling large-scale neural network with open source big data platform Hadoop. Based on Hadoop, we use both MapReduce and Giraph to explore graph algorithms which can process neural network efficiently.</description>
     <link>http://imsure.github.io/NeuralGiraph//</link>
     <atom:link href="http://imsure.github.io/NeuralGiraph//feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 11 Jul 2014 17:34:55 -0500</pubDate>
-    <lastBuildDate>Fri, 11 Jul 2014 17:34:55 -0500</lastBuildDate>
+    <pubDate>Sat, 12 Jul 2014 23:59:26 -0500</pubDate>
+    <lastBuildDate>Sat, 12 Jul 2014 23:59:26 -0500</lastBuildDate>
     <generator>Jekyll v1.5.1</generator>
     
       <item>
-        <title>Introduction</title>
+        <title>Represent a Neural Network in Hadoop</title>
+        <description>&lt;h2 id=&quot;a-neural-network-is-a-graph-structure&quot;&gt;A neural network is a graph structure&lt;/h2&gt;
+
+&lt;p&gt;From computer science perspective, a neural network is a graph
+structure.&lt;/p&gt;
+
+&lt;p&gt;One common way to represent a graph is via an adjacency matrix. As we
+have seen the below figure in the &lt;a href=&quot;/documents/2014/07/06/neuralmodel/&quot;&gt;previous post&lt;/a&gt;,
+the neural network is represented as a &lt;code&gt;N*N&lt;/code&gt; square matrix, where a
+cell value &lt;em&gt;M&lt;sub&gt;ij&lt;/sub&gt;&lt;/em&gt; indicates and edge from vertex &lt;em&gt;n&lt;sub&gt;i&lt;/sub&gt;&lt;/em&gt;
+to vertex &lt;em&gt;n&lt;sub&gt;j&lt;/sub&gt;&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Using matrix is straightforward, but the matrix we are seeing is
+sparse, that is, a lot of cells are empty, and it is not algorithmically efficient to use a matrix
+representation to process the neural network.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/matrix-two-channels.svg&quot; alt=&quot;matrix two channels&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;For computer scientists, it is more natural to represent a graph with
+adjacency lists, in which a vertex is associated with neighbors that
+can be reached via outgoing edges. &lt;/p&gt;
+
+&lt;p&gt;In our implementation, the graph structure for a specific neuron is
+defined as:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;[meta-data associated with the neuron][adjacency list]&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;meta-data associated with the neuron&lt;/code&gt; follows the schema below:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;neuron ID, neuron type, time step, parameters, recovery variable,
+membrane potential, input synaptic currents, firing flag, channel&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;adjacency list&lt;/code&gt; follows the schema below:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;neuron ID-1:synaptic weight-1, neuron ID-2:synaptic weight-2,
+... neuron ID-n:synaptic weight-n&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;In Hadoop, we used a custom writable &lt;code&gt;NeuronWritable&lt;/code&gt; to store
+&lt;code&gt;meta-data associated with the neuron&lt;/code&gt; and Hadoop’s own Text format
+for adjacency list.&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 07 Jul 2014 16:58:57 -0500</pubDate>
+        <link>http://imsure.github.io/NeuralGiraph//documents/2014/07/07/represent-neural-network/</link>
+        <guid isPermaLink="true">http://imsure.github.io/NeuralGiraph//documents/2014/07/07/represent-neural-network/</guid>
+        
+        
+        <category>documents</category>
+        
+      </item>
+    
+      <item>
+        <title>Neural Model</title>
+        <description>&lt;h2 id=&quot;simple-model-of-spiking-neurons&quot;&gt;Simple Model of Spiking Neurons&lt;/h2&gt;
+
+&lt;p&gt;We are using a
+&lt;a href=&quot;http://www.izhikevich.org/publications/spikes.htm&quot;&gt;simple model of spiking neurons&lt;/a&gt;
+presented by &lt;a href=&quot;http://www.izhikevich.org/&quot;&gt;Izhikevich&lt;/a&gt;. The model was
+used to simulate tens of thousands of spiking cortical neurons in real
+time.&lt;/p&gt;
+
+&lt;h2 id=&quot;how-model-works&quot;&gt;How model works&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/spiking-model.svg&quot; alt=&quot;spiking model&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;A neuron would receive synaptic currents from its incoming neighbors,
+these currents adding up together would trigger a voltage change in
+the membrane, either positive or negative. If the voltage reaches to a
+threshold value, the neuron would send synaptic currents to its
+outgoing neighbors.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/plots-1000-network.svg&quot; alt=&quot;firing-1000&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The above figures are showing some simulation results of a small
+neural network with 1000 neurons. These plots are statistically
+identical with the results given by
+&lt;a href=&quot;http://www.izhikevich.org/publications/spikes.pdf&quot;&gt;Izhikevich’s paper&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;a-neural-network-with-more-types-and-multiple-channels&quot;&gt;A Neural Network with more types and multiple channels&lt;/h2&gt;
+
+&lt;p&gt;We extend the model to support:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;more types of neurons&lt;/li&gt;
+  &lt;li&gt;multiple channels in the neural network&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Below is a detailed illustration of how a neural network with two
+channels, including channel connections, looks like as a matrix.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/matrix-two-channels.svg&quot; alt=&quot;matrix two channels&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/channels_firing.png&quot; alt=&quot;firing two channels&quot; height=&quot;600&quot; width=&quot;800&quot; align=&quot;middle&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Sun, 06 Jul 2014 16:58:57 -0500</pubDate>
+        <link>http://imsure.github.io/NeuralGiraph//documents/2014/07/06/neuralmodel/</link>
+        <guid isPermaLink="true">http://imsure.github.io/NeuralGiraph//documents/2014/07/06/neuralmodel/</guid>
+        
+        
+        <category>documents</category>
+        
+      </item>
+    
+      <item>
+        <title>Overview</title>
         <description>&lt;h2 id=&quot;why-are-we-doing-this&quot;&gt;Why are we doing this?&lt;/h2&gt;
 
 &lt;p&gt;Neural network is a large and complex system. Being able to simualte
@@ -32,21 +137,21 @@ it is a effective model for large-scale iterative graph processing.&lt;/p&gt;
 
 &lt;h2 id=&quot;basic-work-flow&quot;&gt;Basic work flow&lt;/h2&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/work-flow.svg&quot; alt=&quot;basic work flow&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/work-flow.svg&quot; alt=&quot;alt basic work flow&quot; /&gt;&lt;/p&gt;
 
-&lt;h3 id=&quot;phase-one-generating-neural-network&quot;&gt;phase one: generating neural network&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;phase one: generating neural network&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;The neural network to be processed is configurable by a set of XML
 templates. These templates then go through a Python parser which will
 create the configurations in XML format and feed it to a MapReduce
 job to generate the neural network in parallel. &lt;/p&gt;
 
-&lt;h3 id=&quot;phase-two-modeling-with-giraph&quot;&gt;phase two: modeling with &lt;a href=&quot;http://giraph.apache.org/&quot;&gt;Giraph&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;phase two: modeling with &lt;a href=&quot;http://giraph.apache.org/&quot;&gt;Giraph&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;The neural network generated in phase one is then passed to a &lt;a href=&quot;http://giraph.apache.org/&quot;&gt;Giraph&lt;/a&gt;
 job for simulation.&lt;/p&gt;
 
-&lt;h3 id=&quot;phase-three-post-analysis&quot;&gt;phase three: post analysis&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;phase three: post analysis&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;The results output by phase two are then used for post analysis, such
 as firing rate computation and firing plots.&lt;/p&gt;
@@ -54,40 +159,12 @@ as firing rate computation and firing plots.&lt;/p&gt;
 &lt;p&gt;That’s it ^_^&lt;/p&gt;
 
 </description>
-        <pubDate>Fri, 11 Jul 2014 16:58:57 -0500</pubDate>
-        <link>http://imsure.github.io/NeuralGiraph//documents/2014/07/11/introduction/</link>
-        <guid isPermaLink="true">http://imsure.github.io/NeuralGiraph//documents/2014/07/11/introduction/</guid>
+        <pubDate>Sat, 05 Jul 2014 16:58:57 -0500</pubDate>
+        <link>http://imsure.github.io/NeuralGiraph//documents/2014/07/05/overview/</link>
+        <guid isPermaLink="true">http://imsure.github.io/NeuralGiraph//documents/2014/07/05/overview/</guid>
         
         
         <category>documents</category>
-        
-      </item>
-    
-      <item>
-        <title>Welcome to Jekyll!</title>
-        <description>&lt;p&gt;You’ll find this post in your &lt;code&gt;_posts&lt;/code&gt; directory - edit this post and re-build (or run with the &lt;code&gt;-w&lt;/code&gt; switch) to see your changes!
-To add new posts, simply add a file in the &lt;code&gt;_posts&lt;/code&gt; directory that follows the convention: YYYY-MM-DD-name-of-post.ext.&lt;/p&gt;
-
-&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Hi, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;Tom&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;#=&amp;gt; prints &amp;#39;Hi, Tom&amp;#39; to STDOUT.&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Check out the &lt;a href=&quot;http://jekyllrb.com&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;.&lt;/p&gt;
-
-</description>
-        <pubDate>Thu, 10 Jul 2014 16:58:57 -0500</pubDate>
-        <link>http://imsure.github.io/NeuralGiraph//jekyll/update/2014/07/10/welcome-to-jekyll2/</link>
-        <guid isPermaLink="true">http://imsure.github.io/NeuralGiraph//jekyll/update/2014/07/10/welcome-to-jekyll2/</guid>
-        
-        
-        <category>jekyll</category>
-        
-        <category>update</category>
         
       </item>
     
