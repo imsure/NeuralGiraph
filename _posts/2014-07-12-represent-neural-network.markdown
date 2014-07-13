@@ -30,3 +30,14 @@ In our implementation, the graph structure for a specific neuron is
 defined as:
 
 `[meta-data associated with the neuron][adjacency list]`
+
+`meta-data associated with the neuron` follows the schema below:
+
+`neuron ID, neuron type, time step, parameters, recovery variable,
+membrane potential, input synaptic currents, firing flag, channel`
+
+`adjacency list` follows the schema below:
+
+`neuron ID-1:synaptic weight-1, neuron ID-2:synaptic weight-2,
+... neuron ID-n:synaptic weight-n`
+
