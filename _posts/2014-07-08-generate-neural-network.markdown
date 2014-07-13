@@ -23,9 +23,9 @@ such as `total number of neurons in one channel`, `number of
 channels`, `connections between channels` and `range partitioning by
 neuron types`, etc.
 
-{% highlight javascript %}
-var s = "JavaScript syntax highlighting";
-alert(s);
+{% highlight xml %}
+<global>4
+</global>
 {% endhighlight %}
 
 
