@@ -2,13 +2,12 @@
 title: Large-scale Neural Modeling using MapReduce & Giraph
 email: imsure95@gmail.com
 description: "Welcome! The site contains documents about our research project. We
-are interested in modeling large-scale neural network with open source big data platform
-Hadoop. Based on Hadoop, we use both MapReduce and Giraph to explore graph algorithms which
-can process neural network efficiently."
+are interested in using MapReduce and Giraph to explore graph algorithms which
+can process large-scale neural networks efficiently."
 baseurl: "/NeuralGiraph"
 url: "http://imsure.github.io/NeuralGiraph/"
-# twitter_username: jekyllrb
-github_username:  imsure/NeuralGiraph
+
+github_username:  imsure
 
 # Build settings
 markdown: kramdown
