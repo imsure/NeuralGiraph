@@ -1,7 +1,7 @@
 # Site settings
 title: Large-scale Neural Modeling using MapReduce & Giraph
 email: imsure95@gmail.com
-description: "Welcome! The site contains documents about our research project. We
+description: "Welcome! The site contains the documents about our research project. We
 are interested in using MapReduce and Giraph to explore graph algorithms which
 can process large-scale neural networks efficiently."
 baseurl: "/NeuralGiraph"
